@@ -1,0 +1,21 @@
+{
+  "name": "rxjs-cache-service",
+  "version": "1.0.0",
+  "description": "Cache Service for Rxjs",
+  "author": "Pouria Rezaei",
+  "main": "index.js",
+  "homepage": "https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme",
+  "scripts": {},
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pouria-Rezaeii/rxjs-cache-service.git"
+  },
+  "keywords": [
+    "rxjs",
+    "cache"
+  ],
+  "bugs": {
+    "url": "https://github.com/Pouria-Rezaeii/rxjs-cache-service/issues"
+  }
+}
