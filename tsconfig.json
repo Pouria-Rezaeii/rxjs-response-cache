@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "module": "esnext",
-    "target": "es2016",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "rootDir": "./src",                                  /* Specify the root folder within your source files. */
-    "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
-    "strict": true,                                      /* Enable all strict type-checking options. */
-    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
-    "declaration": true,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
-    "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
-    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
-    "moduleResolution": "node"
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+   "compilerOptions": {
+      "allowSyntheticDefaultImports": true,
+      "module": "commonjs",
+      "target": "es2015" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+      "rootDir": "./src" /* Specify the root folder within your source files. */,
+      "outDir": "./dist" /* Specify an output folder for all emitted files. */,
+      "strict": true /* Enable all strict type-checking options. */,
+      "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+      "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
+      "sourceMap": true /* Create source map files for emitted JavaScript files. */,
+      "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+      "moduleResolution": "node"
+   },
+   "include": ["src/**/*.ts"],
+   "exclude": ["node_modules", "/dist"]
 }
