@@ -25,6 +25,7 @@
       "prepare": "husky install",
       "lint": "eslint . --ext .js,.ts && tsc --noEmit",
       "test": "jest --runInBand",
+      "check": "npm run lint && npm run test",
       "test:watch": "jest --watchAll"
    },
    "devDependencies": {
