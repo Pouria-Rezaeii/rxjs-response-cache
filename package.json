@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Cache Service for Rxjs, Caches Rxjs responses in a global context",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "author": "Pouria Rezaei",
   "license": "MIT",
   "homepage": "https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme",
@@ -23,6 +27,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "typescript": "^5.2.2"
   }
 }
