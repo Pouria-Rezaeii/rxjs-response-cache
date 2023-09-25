@@ -1,5 +1,5 @@
 import {Observable} from "rxjs";
-import {CacheService} from "../src/cache.service";
+import {CacheService} from "../cache.service";
 
 describe("Cache service initialization", () => {
    let cacheService: CacheService;

@@ -1,4 +1,4 @@
-import {CacheService} from "../src/cache.service";
+import {CacheService} from "../cache.service";
 import {lastValueFrom, firstValueFrom, Observable} from "rxjs";
 import {posts} from "./server/posts";
 import {observableFunction} from "./utils/observable-function";
