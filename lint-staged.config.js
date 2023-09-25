@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 module.exports = {
    // Type check TypeScript files
-   "**/*.(ts)": () => "yarn tsc --noEmit",
+   "**/*.(ts)": () => "yarn tsc",
 
    // Lint then format TypeScript and JavaScript files
    "**/*.(ts|js)": (filenames) => [
