@@ -28,7 +28,6 @@ describe("Cache service error handling", () => {
       }
    });
 
-   // TODO: maybe this behavior can be changed by user decision in configuration parameter
    it("Returns the cached date and throws the error correctly if refresh request fails.", async () => {
       await firstValueFrom(
          cacheService.get<Observable<unknown>>({
