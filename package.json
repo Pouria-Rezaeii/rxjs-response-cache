@@ -23,7 +23,7 @@
    ],
    "scripts": {
       "prepare": "husky install",
-      "lint": "eslint . --ext .js,.ts && tsc",
+      "lint": "eslint . --ext .js,.ts && tsc --noEmit",
       "check": "npm run lint && npm run test",
       "test": "jest --runInBand",
       "test:watch": "jest --watchAll"

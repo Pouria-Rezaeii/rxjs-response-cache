@@ -6,7 +6,7 @@ interface ObservableConstructor {
 
 export type CacheConfigType = {
    isDevMode: boolean;
-   paramsObjectIsPrior?: boolean;
+   paramsObjectOverwritesUrlQueries?: boolean;
    observableConstructor: ObservableConstructor;
    devtool?: DevtoolConfig;
 };
@@ -29,6 +29,7 @@ export type ObservableConfig = {
    refresh?: boolean;
    clearTime?: number;
    params?: Record<string, string | number | boolean>;
+   defaultParams?: Record<string, string | number | boolean>;
 };
 
 export type UrlQueryOptions = {

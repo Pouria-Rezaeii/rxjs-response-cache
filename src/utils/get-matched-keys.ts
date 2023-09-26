@@ -5,10 +5,14 @@ export function getMatchedKeys(params: {
    source: Record<string, any>;
    keyPart: string;
    options?: UrlQueryOptions;
-   paramsObjectIsPrior?: boolean;
+   paramsObjectOverwrites?: boolean;
 }) {
-   const {source, keyPart, options, paramsObjectIsPrior} = params;
-   const rearrangedKey = rearrangeUrl(keyPart, options?.queryParams, paramsObjectIsPrior);
+   const {source, keyPart, options, paramsObjectOverwrites} = params;
+   const rearrangedKey = rearrangeUrl({
+      url: keyPart,
+      params: options?.queryParams,
+      paramsObjectOverwrites,
+   });
 
    if (options?.exact) {
       return Object.keys(source).filter((url) => url === rearrangedKey);

@@ -1,5 +1,5 @@
 export const defaults = {
-   paramsObjectIsPrior: false,
+   paramsObjectOverwrites: true,
    devtool: {
       show: true,
       isOpenInitially: false,

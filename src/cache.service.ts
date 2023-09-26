@@ -48,8 +48,13 @@ export class CacheService {
    }
 
    public get<T>(config: ObservableConfig): T {
-      const {url: _url, params: queryParams, observable, refresh, clearTime: clearTime} = config;
-      const url = rearrangeUrl(_url, queryParams, this._config.paramsObjectIsPrior);
+      const {url: _url, defaultParams, params, observable, refresh, clearTime} = config;
+      const url = rearrangeUrl({
+         url: _url,
+         defaultParams,
+         params: params,
+         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
+      });
       this._observables[url] = observable;
       const isPresentInCache = this._cachedData[url];
 
@@ -133,7 +138,7 @@ export class CacheService {
          source: this._cachedData,
          keyPart: urlQuery,
          options: options,
-         paramsObjectIsPrior: this._config.paramsObjectIsPrior,
+         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
       });
       matches.forEach((url, index) => {
          delete this._cachedData[url];

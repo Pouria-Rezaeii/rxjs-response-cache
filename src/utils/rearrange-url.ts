@@ -1,11 +1,19 @@
 import {ObservableConfig} from "../types/cache.type";
 import {defaults} from "../defaults";
 
-export function rearrangeUrl(
-   _url: string,
-   params: ObservableConfig["params"] = {},
-   paramsObjectIsPrior: boolean = defaults.paramsObjectIsPrior
-) {
+export function rearrangeUrl(inputs: {
+   url: string;
+   defaultParams?: ObservableConfig["defaultParams"];
+   params?: ObservableConfig["params"];
+   paramsObjectOverwrites?: boolean;
+}) {
+   const {
+      url: _url,
+      defaultParams = {},
+      params = {},
+      paramsObjectOverwrites = defaults.paramsObjectOverwrites,
+   } = inputs;
+
    const splitUrl = _url.split("?");
    const apiAddress = splitUrl[0];
    const urlParams = splitUrl[1] || "";
@@ -20,12 +28,14 @@ export function rearrangeUrl(
       return prev;
    }, {});
 
-   const finalParams = paramsObjectIsPrior
+   const finalParams = paramsObjectOverwrites
       ? {
+           ...defaultParams,
            ...urlParamObject,
            ...params,
         }
       : {
+           ...defaultParams,
            ...params,
            ...urlParamObject,
         };

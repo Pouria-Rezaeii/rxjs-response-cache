@@ -15,8 +15,8 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Sorts the url parameters and params field keys correctly.", async () => {
-      const expectedUrl = postsUrl.concat("?a=T&b=T&g=T&v=T&z=T");
+   it("Sorts the default params, url parameters and params field keys correctly.", async () => {
+      const expectedUrl = postsUrl.concat("?a=T&b=T&g=T&m=T&v=T&z=T");
 
       await lastValueFrom(
          cacheService.get<Observable<unknown>>({
@@ -25,10 +25,28 @@ describe("Cache service rearranging url parameters", () => {
                expect(url).toEqual(expectedUrl);
                return observableFunction(url);
             },
-            params: {
-               v: "T",
-               b: "T",
+            defaultParams: {m: "T"},
+            params: {v: "T", b: "T"},
+         })
+      );
+
+      expect(cacheService.cachedData).toEqual({
+         [expectedUrl]: posts,
+      });
+   });
+
+   it("Overwrites the `defaultParams` keys with url params and params filed keys.", async () => {
+      const expectedUrl = postsUrl.concat("?a=T&b=T&f=T");
+
+      await lastValueFrom(
+         cacheService.get<Observable<unknown>>({
+            url: postsUrl.concat("?a=T"),
+            observable: (url) => {
+               expect(url).toEqual(expectedUrl);
+               return observableFunction(url);
             },
+            defaultParams: {a: "a", b: "b", f: "T"},
+            params: {b: "T"},
          })
       );
 
@@ -42,16 +60,13 @@ describe("Cache service rearranging url parameters", () => {
 
       await lastValueFrom(
          cacheService.get<Observable<unknown>>({
-            url: postsUrl.concat('?a=T&b=null&c=undefined&d=""&e=&f=T&'),
+            url: postsUrl.concat('?a=T&c=undefined&d=""&e=&f=T&'),
             observable: (url) => {
                expect(url).toEqual(expectedUrl);
                return observableFunction(url);
             },
-            params: {
-               g: "null",
-               h: "undefined",
-               i: "",
-            },
+            defaultParams: {v: "null"},
+            params: {g: "null", i: ""},
          })
       );
 
@@ -60,17 +75,23 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Overrides the params object fields with url query params fields.", async () => {
+   it("Overwrites the url query params with params object if `paramsObjectOverwritesUrlQueries = true`.", async () => {
+      cacheService = new CacheService({
+         isDevMode: false,
+         observableConstructor: Observable,
+         paramsObjectOverwritesUrlQueries: true,
+      });
+
       const expectedUrl = postsUrl.concat("?page-size=20");
 
       await lastValueFrom(
          cacheService.get<Observable<unknown>>({
-            url: postsUrl.concat("?page-size=20"),
+            url: postsUrl.concat("?page-size=10"),
             observable: (url) => {
                expect(url).toEqual(expectedUrl);
                return observableFunction(url);
             },
-            params: {"page-size": "10"},
+            params: {"page-size": "20"},
          })
       );
 
@@ -79,14 +100,14 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Overrides the url query params with params object if `paramsObjectIsPrior=true`.", async () => {
+   it("Does NOT overwrite the url query params with params object if `paramsObjectOverwritesUrlQueries = false`.", async () => {
       cacheService = new CacheService({
          isDevMode: false,
          observableConstructor: Observable,
-         paramsObjectIsPrior: true,
+         paramsObjectOverwritesUrlQueries: false,
       });
 
-      const expectedUrl = postsUrl.concat("?page-size=20");
+      const expectedUrl = postsUrl.concat("?page-size=10");
 
       await lastValueFrom(
          cacheService.get<Observable<unknown>>({
@@ -119,10 +140,7 @@ describe("Cache service rearranging url parameters", () => {
          cacheService.get<Observable<unknown>>({
             url: postsUrl.concat("?m=null&z=T&k=&c=T&"),
             observable: (url) => observableFunction(url),
-            params: {
-               f: "undefined",
-               g: "T",
-            },
+            params: {f: "undefined", g: "T"},
          })
       );
 
