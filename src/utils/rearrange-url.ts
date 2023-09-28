@@ -18,7 +18,11 @@ export function rearrangeUrl(inputs: {
    const apiAddress = splitUrl[0];
    const urlParams = splitUrl[1] || "";
 
-   if (!urlParams && !Object.keys(params || {}).length) {
+   if (
+      !urlParams &&
+      !Object.keys(defaultParams || {}).length &&
+      !Object.keys(params || {}).length
+   ) {
       return apiAddress;
    }
 

@@ -15,7 +15,48 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Sorts the default params, url parameters and params field keys correctly.", async () => {
+   it("Accepts query params in the url property.", async () => {
+      await lastValueFrom(
+         cacheService.get<Observable<unknown>>({
+            url: postsUrl.concat("?a=T"),
+            observable: (url) => observableFunction(url),
+         })
+      );
+
+      expect(cacheService.cachedData).toEqual({
+         [postsUrl.concat("?a=T")]: posts,
+      });
+   });
+
+   it("Accepts query params defaultParams property", async () => {
+      await lastValueFrom(
+         cacheService.get<Observable<unknown>>({
+            url: postsUrl,
+            observable: (url) => observableFunction(url),
+            defaultParams: {a: "T"},
+         })
+      );
+
+      expect(cacheService.cachedData).toEqual({
+         [postsUrl.concat("?a=T")]: posts,
+      });
+   });
+
+   it("Accepts query params in the params property.", async () => {
+      await lastValueFrom(
+         cacheService.get<Observable<unknown>>({
+            url: postsUrl,
+            observable: (url) => observableFunction(url),
+            params: {a: "T"},
+         })
+      );
+
+      expect(cacheService.cachedData).toEqual({
+         [postsUrl.concat("?a=T")]: posts,
+      });
+   });
+
+   it("Sorts the default params, url parameters and params properties keys correctly.", async () => {
       const expectedUrl = postsUrl.concat("?a=T&b=T&g=T&m=T&v=T&z=T");
 
       await lastValueFrom(
@@ -35,7 +76,7 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Overwrites the `defaultParams` keys with url params and params filed keys.", async () => {
+   it("Overwrites the defaultParams keys with url params and params property keys.", async () => {
       const expectedUrl = postsUrl.concat("?a=T&b=T&f=T");
 
       await lastValueFrom(
