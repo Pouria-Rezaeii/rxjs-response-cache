@@ -170,60 +170,49 @@ export const itemButton: CSSStyles = {
 };
 
 export function addDefaultStyles() {
-   const styleSheet = document.styleSheets[0];
-   styleSheet.insertRule(`
-    #devtool-container * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      color: #c2c2c2;
-      font-family: Ubuntu;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-  `);
-
-   styleSheet.insertRule(`
-    .button:hover {
-      transition: .2s;
-      filter: saturate(1.15) brightness(115%);
-    }
-  `);
-
-   styleSheet.insertRule(`
-    .primary-color {
-      color: ${primaryColor} !important;
-    }
-  `);
-
-   styleSheet.insertRule(`
-    input::placeholder {
-      color: #ffffff66;
-    }
-  `);
-
-   styleSheet.insertRule(`
-    ::selection {
-      color: #ffffff;
-      background-color: ${primaryColor};
-    }
-  `);
-
-   styleSheet.insertRule(`
-    #devtool-list::-webkit-scrollbar {
-      width: 5px;
-    }
-  `);
-
-   styleSheet.insertRule(`
-    #devtool-list::-webkit-scrollbar-track {
-      background-color: #ffffff18;
-    }
-  `);
-
-   styleSheet.insertRule(`
-    #devtool-list::-webkit-scrollbar-thumb {
-      background-color: #ffffff66;
-    }
-  `);
+   document.head.insertAdjacentHTML(
+      "beforeend",
+      `<style>
+         @import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+         #devtool-container * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #c2c2c2;
+            font-family: Ubuntu , Oxygen , Roboto , Cantarell;
+            font-size: 13px;
+            line-height: 1.5;
+         }
+      
+         .button:hover {
+            transition: .2s;
+            filter: saturate(1.15) brightness(115%);
+         }
+      
+         .primary-color {
+            color: ${primaryColor} !important;
+         }
+      
+         input::placeholder {
+            color: #ffffff66;
+         }
+      
+         ::selection {
+            color: #ffffff;
+            background-color: ${primaryColor};
+         }
+      
+         #devtool-list::-webkit-scrollbar {
+            width: 5px;
+         }
+      
+         #devtool-list::-webkit-scrollbar-track {
+            background-color: #ffffff18;
+         }
+      
+         #devtool-list::-webkit-scrollbar-thumb {
+            background-color: #ffffff66;
+         }
+      </style>`
+   );
 }
