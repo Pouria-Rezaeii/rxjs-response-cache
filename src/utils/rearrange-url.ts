@@ -9,8 +9,8 @@ export function rearrangeUrl(inputs: {
 }) {
    const {
       url: _url,
-      defaultParams = {},
-      params = {},
+      defaultParams,
+      params,
       paramsObjectOverwrites = defaults.paramsObjectOverwrites,
    } = inputs;
 
@@ -18,7 +18,7 @@ export function rearrangeUrl(inputs: {
    const apiAddress = splitUrl[0];
    const urlParams = splitUrl[1] || "";
 
-   if (!urlParams && !Object.keys(params).length) {
+   if (!urlParams && !Object.keys(params || {}).length) {
       return apiAddress;
    }
 

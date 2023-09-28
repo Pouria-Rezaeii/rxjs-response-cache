@@ -21,6 +21,7 @@ export function getMatchedKeys(params: {
       let matches = Object.keys(source).filter((url) => url.includes(rearrangedKey.split("?")[0]));
       // check for query params
       if (rearrangedKey.split("?")[1]) {
+         // example of queryKeyValuePairs: ["a=b", "c=d"]
          const queryKeyValuePairs = rearrangedKey.split("?")[1].split("&");
          matches = matches.filter((url) => queryKeyValuePairs.every((pair) => url.includes(pair)));
       }

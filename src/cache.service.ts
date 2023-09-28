@@ -15,6 +15,14 @@ import {
 } from "./utils/timeout-utils";
 import {defaults} from "./defaults";
 
+/**
+ * @class Global caching service for rxjs GET method responses.
+ * @see how to use on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+ * @usageNote Instantiate the service at the root level of your application, and with the help
+ * of the get method, store rxjs GET method responses in a global context,
+ * and access them in any other place or any other time ---
+ * Multiple instances is supported, but the devtool SHOULD be used only for one instance at a time.
+ * */
 export class CacheService {
    private _isDev: boolean;
    private _showDevtool: boolean;
@@ -23,6 +31,13 @@ export class CacheService {
    private _clearTimeouts: Record<string, number> = {};
    private _observables: Record<string, ObservableFunc> = {};
 
+   /**
+    * @see how to use on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    * @prop observableConstructor --- pass your version of Observable constructor exported from rxjs package
+    * @prop isDevMode --- if true, and devtool.show also equals true, the devtool will be attached to the body
+    * @prop paramsObjectOverwritesUrlQueries --- represent if params object should overwrite the query params in the url field, passed to the get method
+    * @prop devtool --- develop tool configuration. The Devtool lets you inspect the cache state and cache history
+    */
    constructor(config: CacheConfigType) {
       this._config = config;
       this._isDev = config.isDevMode;
@@ -47,6 +62,30 @@ export class CacheService {
       });
    }
 
+   /**
+    * @see examples on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    * @usageNote the method combines params, defaultParams and query strings contained in
+    *       the url, orders them alphabetically, removes the empty strings, null, and
+    *       undefined values and uses them as the key to store the response.
+    * @usageNote If using with typescript consider that the method accepts a generic type,
+    *       and the generic type should also be contained within the Observable type
+    *       (example: get<Observable<Post[]>>(params)). This is because the package
+    *       is zero dependency and and does not now which version of rxjs your going to pass in
+    * @prop url --- the string part of the url (may also contain query strings)
+    * @prop observable --- observable callback function (should return your observable function) ---
+    *       it receives the rearranged url as argument
+    * @prop defaultParams --- the default query parameters which will be overwritten by
+    *       the url query strings or params field in the case of duplication ---
+    *       If your endpoint uses any default parameters, include them here to get the
+    *       best possible result
+    * @prop params --- query parameters (will overwrite the defaultParameters and
+    *       the url query strings by default)
+    * @prop refresh --- pass true if you want to get the refreshed data after the staled ---
+    *       If true, the observable.next function probably will be called twice, first time returns the
+    *       staled data (if exist), and the last time the refreshed.
+    * @prop clearTime --- the time offset in milliseconds that the cached data should be removed
+    * @returns a new brand observable
+    */
    public get<T>(config: ObservableConfig): T {
       const {url: _url, defaultParams, params, observable, refresh, clearTime} = config;
       const url = rearrangeUrl({
@@ -133,6 +172,14 @@ export class CacheService {
          this._updateDevtool(url, `🕓 Removal timeout set for ${date.toLocaleTimeString()}`, data);
    }
 
+   /**
+    * Searches for all matched keys based on a given string key and deletes them from the cache
+    * @see examples on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    * @prop options.exact --- specifies if the search operation should be based on exact match or not
+    * @usageNote Query params can be included in both the key argument or the options.params property ---
+    * Before searching, query params will be sorted alphabetically and empty strings, null and undefined
+    * values will be removed
+    */
    public clean(urlQuery: string, options?: UrlQueryOptions) {
       const matches = getMatchedKeys({
          source: this._cachedData,
@@ -153,6 +200,7 @@ export class CacheService {
       });
    }
 
+   /** Resets the cache state */
    public resetCache() {
       this._cachedData = {};
       this._observables = {};
