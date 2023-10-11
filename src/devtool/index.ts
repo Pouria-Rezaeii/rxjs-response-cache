@@ -47,7 +47,6 @@ function attachToggleButton() {
    }
 
    const toggleButton = createElement({
-      tagName: "div",
       innerHtml: "Cache Devtool",
       id: ids.toggleButton,
       class: "button",
@@ -70,7 +69,6 @@ function attachContainer(onClickCacheStateButton: (state: any) => void) {
    }
 
    const container = createElement({
-      tagName: "div",
       id: ids.container,
       styles: styles.container(config?.styles, devtoolIsOpen),
    });
@@ -81,8 +79,44 @@ function attachContainer(onClickCacheStateButton: (state: any) => void) {
       styles: styles.title,
    });
 
+   const list = createElement({
+      id: ids.list,
+      styles: styles.list,
+   });
+
+   const buttonsBox = createElement({
+      styles: styles.devtoolControlsBox,
+   });
+
+   const logCacheButton = createElement({
+      innerHtml: "Log Cache Last State",
+      class: "button",
+      styles: styles.logCacheButton,
+      onClick: onClickCacheStateButton,
+   });
+
+   const clearDevtoolButton = createElement({
+      innerHtml: "✕ Clear Devtool",
+      class: "button",
+      styles: styles.clearDevtoolButton,
+      onClick: clearHistory,
+   });
+
+   buttonsBox.appendChild(clearDevtoolButton);
+   buttonsBox.appendChild(logCacheButton);
+   container.appendChild(title);
+   container.appendChild(generateSearchBox());
+   container.appendChild(list);
+   container.appendChild(buttonsBox);
+   document.querySelector("body")?.appendChild(container);
+}
+
+function generateSearchBox() {
+   const searchBox = createElement({
+      styles: styles.searchBox,
+   });
+
    const searchInputContainer = createElement({
-      tagName: "div",
       styles: styles.searchInputContainer,
    });
 
@@ -99,7 +133,6 @@ function attachContainer(onClickCacheStateButton: (state: any) => void) {
    });
 
    const inputClearButton = createElement({
-      tagName: "div",
       innerHtml: "✕",
       class: "button",
       styles: styles.inputClearButton,
@@ -113,47 +146,15 @@ function attachContainer(onClickCacheStateButton: (state: any) => void) {
    searchInputContainer.appendChild(inputClearButton);
 
    const searchHelperText = createElement({
-      tagName: "div",
       innerHtml: "Showing all results.",
       id: ids.searchHelperText,
       styles: styles.searchHelperText,
    });
 
-   const list = createElement({
-      tagName: "div",
-      id: ids.list,
-      styles: styles.list,
-   });
+   searchBox.appendChild(searchInputContainer);
+   searchBox.appendChild(searchHelperText);
 
-   const buttonsBox = createElement({
-      tagName: "div",
-      styles: styles.devtoolControlsBox,
-   });
-
-   const logCacheButton = createElement({
-      tagName: "div",
-      innerHtml: "Log Cache Last State",
-      class: "button",
-      styles: styles.logCacheButton,
-      onClick: onClickCacheStateButton,
-   });
-
-   const clearDevtoolButton = createElement({
-      tagName: "div",
-      innerHtml: "✕ Clear Devtool",
-      class: "button",
-      styles: styles.clearDevtoolButton,
-      onClick: clearHistory,
-   });
-
-   buttonsBox.appendChild(clearDevtoolButton);
-   buttonsBox.appendChild(logCacheButton);
-   container.appendChild(title);
-   container.appendChild(searchInputContainer);
-   container.appendChild(searchHelperText);
-   container.appendChild(list);
-   container.appendChild(buttonsBox);
-   document.querySelector("body")?.appendChild(container);
+   return searchBox;
 }
 
 function filterListByQuery(query: string) {
@@ -179,12 +180,10 @@ function filterListByQuery(query: string) {
 function createListItem(number: number, params: DevtoolHistoryListItem) {
    const {url, status, data, cacheState, time} = params;
    const itemButtonsBox = createElement({
-      tagName: "div",
       styles: styles.itemButtonsBox,
    });
 
    const dataButton = createElement({
-      tagName: "div",
       innerHtml: "Log Data",
       class: "button",
       styles: styles.itemButton,
@@ -192,7 +191,6 @@ function createListItem(number: number, params: DevtoolHistoryListItem) {
    });
 
    const cacheButton = createElement({
-      tagName: "div",
       innerHtml: "Cache State",
       class: "button",
       styles: styles.itemButton,
@@ -203,13 +201,10 @@ function createListItem(number: number, params: DevtoolHistoryListItem) {
    itemButtonsBox.appendChild(cacheButton);
 
    const listItem = createElement({
-      tagName: "div",
       styles: styles.listItem,
    });
 
-   const itemTextContentBox = createElement({
-      tagName: "div",
-   });
+   const itemTextContentBox = createElement({});
 
    [
       {key: `#${number}`, value: time},
@@ -217,7 +212,6 @@ function createListItem(number: number, params: DevtoolHistoryListItem) {
       {key: "Status:", value: status},
    ].forEach((item) => {
       const row = createElement({
-         tagName: "div",
          styles: styles.flexBox,
          innerHtml: `
       <p style="width:48px; flex-shrink:0;">${item.key}</p>

@@ -1,12 +1,12 @@
 export function createElement(options: {
-   tagName: keyof HTMLElementTagNameMap;
+   tagName?: keyof HTMLElementTagNameMap;
    innerHtml?: string;
    id?: string;
    class?: string;
    styles?: Partial<CSSStyleDeclaration>;
    onClick?: (event: Event) => void;
 }) {
-   const element = document.createElement(options.tagName);
+   const element = document.createElement(options.tagName || "div");
    options.innerHtml && (element.innerHTML = options.innerHtml);
    options.id && element.setAttribute("id", options.id);
    options.class && element.setAttribute("class", options.class);

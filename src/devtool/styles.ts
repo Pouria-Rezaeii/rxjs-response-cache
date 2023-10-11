@@ -67,6 +67,11 @@ export const title: CSSStyles = {
    textShadow: "1px 1px 4px #333",
 };
 
+export const searchBox: CSSStyles = {
+   width: "100%",
+   marginBottom: "12px",
+};
+
 export const searchInputContainer: CSSStyles = {
    width: "calc(100% - 11px)",
    position: "relative",
@@ -99,7 +104,6 @@ export const inputClearButton: CSSStyles = {
 };
 
 export const searchHelperText: CSSStyles = {
-   marginBottom: "12px",
    paddingLeft: "3px",
 };
 
