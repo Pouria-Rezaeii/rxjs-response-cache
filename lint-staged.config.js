@@ -7,8 +7,6 @@ module.exports = {
       `yarn eslint --fix ${filenames.join(" ")}`,
       // run prettier
       `yarn prettier --write ${filenames.join(" ")}`,
-      // compile all TypeScript files (ignoring tests)
-      "yarn tsc --project tsconfig.compile.json",
    ],
 
    // Format MarkDown and JSON
