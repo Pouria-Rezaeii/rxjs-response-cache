@@ -49,7 +49,7 @@ function attachToggleButton() {
    const toggleButton = createElement({
       innerHtml: "Cache Devtool",
       id: ids.toggleButton,
-      class: "button",
+      class: "devtool-button",
       styles: styles.toggleButton(config?.styles),
       onClick: () => {
          const container = document.getElementById(ids.container);
@@ -73,42 +73,41 @@ function attachContainer(onClickCacheStateButton: (state: any) => void) {
       styles: styles.container(config?.styles, devtoolIsOpen),
    });
 
-   const title = createElement({
-      tagName: "h1",
-      innerHtml: "Cache Devtool",
-      styles: styles.title,
-   });
-
    const list = createElement({
       id: ids.list,
       styles: styles.list,
    });
 
-   const buttonsBox = createElement({
-      styles: styles.devtoolControlsBox,
-   });
-
-   const logCacheButton = createElement({
-      innerHtml: "Log Cache Last State",
-      class: "button",
-      styles: styles.logCacheButton,
-      onClick: onClickCacheStateButton,
-   });
-
-   const clearDevtoolButton = createElement({
-      innerHtml: "✕ Clear Devtool",
-      class: "button",
-      styles: styles.clearDevtoolButton,
-      onClick: clearHistory,
-   });
-
-   buttonsBox.appendChild(clearDevtoolButton);
-   buttonsBox.appendChild(logCacheButton);
-   container.appendChild(title);
+   container.appendChild(generateTitleBox());
    container.appendChild(generateSearchBox());
    container.appendChild(list);
-   container.appendChild(buttonsBox);
+   container.appendChild(generateControlsBox(onClickCacheStateButton));
    document.querySelector("body")?.appendChild(container);
+}
+
+function generateTitleBox() {
+   const titleBox = createElement({
+      styles: styles.titleBox,
+   });
+
+   const title = createElement({
+      tagName: "p",
+      innerHtml: "Cache Devtool",
+      styles: styles.title,
+   });
+
+   const closeButton = createElement({
+      innerHtml: "✕",
+      styles: styles.closeButton,
+      class: "devtool-button",
+      title: "Close Devtool",
+      onClick: () => document.getElementById(ids.toggleButton)?.click(),
+   });
+
+   titleBox.appendChild(title);
+   titleBox.appendChild(closeButton);
+
+   return titleBox;
 }
 
 function generateSearchBox() {
@@ -134,8 +133,9 @@ function generateSearchBox() {
 
    const inputClearButton = createElement({
       innerHtml: "✕",
-      class: "button",
+      class: "devtool-button",
       styles: styles.inputClearButton,
+      title: "Clear",
       onClick: () => {
          filterListByQuery("");
          (document.getElementById(ids.searchInput) as HTMLInputElement).value = "";
@@ -155,6 +155,31 @@ function generateSearchBox() {
    searchBox.appendChild(searchHelperText);
 
    return searchBox;
+}
+
+function generateControlsBox(onClickCacheStateButton: (state: any) => void) {
+   const buttonsBox = createElement({
+      styles: styles.devtoolControlsBox,
+   });
+
+   const logCacheButton = createElement({
+      innerHtml: "Log Cache Last State",
+      class: "devtool-button",
+      styles: styles.logCacheButton,
+      onClick: onClickCacheStateButton,
+   });
+
+   const clearDevtoolButton = createElement({
+      innerHtml: "✕ Clear Devtool",
+      class: "devtool-button",
+      styles: styles.clearDevtoolButton,
+      onClick: clearHistory,
+   });
+
+   buttonsBox.appendChild(clearDevtoolButton);
+   buttonsBox.appendChild(logCacheButton);
+
+   return buttonsBox;
 }
 
 function filterListByQuery(query: string) {
@@ -185,14 +210,14 @@ function createListItem(number: number, params: DevtoolHistoryListItem) {
 
    const dataButton = createElement({
       innerHtml: "Log Data",
-      class: "button",
+      class: "devtool-button",
       styles: styles.itemButton,
       onClick: () => console.log(data),
    });
 
    const cacheButton = createElement({
-      innerHtml: "Cache State",
-      class: "button",
+      innerHtml: "Log Cache",
+      class: "devtool-button",
       styles: styles.itemButton,
       onClick: () => console.log(cacheState),
    });

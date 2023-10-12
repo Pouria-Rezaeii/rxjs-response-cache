@@ -60,11 +60,29 @@ export const container = (stylesConfig: StylesConfig, isInitiallyOpen: boolean):
    padding: "20px 6px 20px 10px",
 });
 
-export const title: CSSStyles = {
+export const titleBox: CSSStyles = {
+   width: "100%",
+   display: "flex",
+   justifyContent: "space-between",
+   alignItems: "center",
+   paddingRight: "10px",
    marginBottom: "24px",
+};
+
+export const title: CSSStyles = {
    fontSize: "30px",
    color: primaryColor,
    textShadow: "1px 1px 4px #333",
+};
+
+export const closeButton: CSSStyles = {
+   ...buttonDefaultStyles,
+   padding: "0",
+   border: "1px solid #ffffff33",
+   fontSize: "20px",
+   width: "30px",
+   height: "30px",
+   color: "#ffffff55",
 };
 
 export const searchBox: CSSStyles = {
@@ -188,7 +206,7 @@ export function addDefaultStyles() {
             line-height: 1.5;
          }
       
-         .button:hover {
+         .devtool-button:hover {
             transition: .2s;
             filter: saturate(1.15) brightness(115%);
          }
