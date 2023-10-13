@@ -110,12 +110,13 @@ export class CacheService {
 
    private _readFromCache(subscriber: Subscriber, url: string, clearTimeout?: number) {
       subscriber.next(this._cachedData[url]);
-      this._showDevtool &&
-         this._updateDevtool(url, "❤️ Present in the cache", this._cachedData[url]);
       subscriber.complete();
+      let messageText = "❤️ Present in the cache";
       if (clearTimeout && ![this._clearTimeouts[url]]) {
          this._setClearTimeout(url, clearTimeout, this._cachedData[url]);
+         messageText += this._getRemovalTimeoutMessage(clearTimeout);
       }
+      this._showDevtool && this._updateDevtool(url, messageText, this._cachedData[url]);
    }
 
    private _readFromCacheAndRefresh(subscriber: Subscriber, url: string, clearTimeout?: number) {
@@ -128,8 +129,12 @@ export class CacheService {
             this._cachedData[url] = res;
             subscriber.next(res);
             subscriber.complete();
-            this._showDevtool && this._updateDevtool(url, "🔁 Refreshed", res);
-            clearTimeout && this._setClearTimeout(url, clearTimeout, res);
+            let messageText = "🔁 Refreshed";
+            if (clearTimeout) {
+               this._setClearTimeout(url, clearTimeout, res);
+               messageText += this._getRemovalTimeoutMessage(clearTimeout);
+            }
+            this._showDevtool && this._updateDevtool(url, messageText, res);
          },
       });
    }
@@ -141,8 +146,12 @@ export class CacheService {
             this._cachedData[url] = res;
             subscriber.next(res);
             subscriber.complete();
-            this._showDevtool && this._updateDevtool(url, "✅ Not present, fetched", res);
-            clearTimeout && this._setClearTimeout(url, clearTimeout, res);
+            let messageText = "✅ Not present, fetched";
+            if (clearTimeout) {
+               this._setClearTimeout(url, clearTimeout, res);
+               messageText += this._getRemovalTimeoutMessage(clearTimeout);
+            }
+            this._showDevtool && this._updateDevtool(url, messageText, res);
          },
       });
    }
@@ -165,11 +174,12 @@ export class CacheService {
       // setting a new one
       this._clearTimeouts[url] = timeoutId as unknown as number;
       this._isDev && addTimeoutToLocalStorage(timeoutId as unknown as number);
+   }
 
+   private _getRemovalTimeoutMessage(timeout: number) {
       const date = new Date();
       date.setMilliseconds(date.getMilliseconds() + timeout);
-      this._showDevtool &&
-         this._updateDevtool(url, `🕓 Removal timeout set for ${date.toLocaleTimeString()}`, data);
+      return `, 🕓 Removal timeout set for ${date.toLocaleTimeString()}`;
    }
 
    /**
