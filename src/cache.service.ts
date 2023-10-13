@@ -14,6 +14,7 @@ import {
    removeTimeoutFromLocalStorage,
 } from "./utils/timeout-utils";
 import {defaults} from "./defaults";
+import {mapToObject} from "./utils/map-to-object";
 
 /**
  * @class Global caching service for rxjs GET method responses.
@@ -27,9 +28,9 @@ export class CacheService {
    private _isDev: boolean;
    private _showDevtool: boolean;
    private _config: CacheConfigType;
-   private _cachedData: Record<string, any> = {};
-   private _clearTimeouts: Record<string, number> = {};
-   private _observables: Record<string, ObservableFunc> = {};
+   private _cachedData = new Map<string, any>();
+   private _clearTimeouts = new Map<string, number>();
+   private _observables = new Map<string, ObservableFunc>();
 
    /**
     * @see how to use on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
@@ -94,8 +95,8 @@ export class CacheService {
          params: params,
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
       });
-      this._observables[url] = observable;
-      const isPresentInCache = this._cachedData[url];
+      this._observables.set(url, observable);
+      const isPresentInCache = this._cachedData.get(url);
 
       return new this._config.observableConstructor((subscriber) => {
          if (isPresentInCache && !refresh) {
@@ -109,24 +110,24 @@ export class CacheService {
    }
 
    private _readFromCache(subscriber: Subscriber, url: string, clearTimeout?: number) {
-      subscriber.next(this._cachedData[url]);
+      subscriber.next(this._cachedData.get(url));
       subscriber.complete();
       let messageText = "❤️ Present in the cache";
-      if (clearTimeout && ![this._clearTimeouts[url]]) {
-         this._setClearTimeout(url, clearTimeout, this._cachedData[url]);
+      if (clearTimeout && ![this._clearTimeouts.has(url)]) {
+         this._setClearTimeout(url, clearTimeout, this._cachedData.get(url));
          messageText += this._getRemovalTimeoutMessage(clearTimeout);
       }
-      this._showDevtool && this._updateDevtool(url, messageText, this._cachedData[url]);
+      this._showDevtool && this._updateDevtool(url, messageText, this._cachedData.get(url));
    }
 
    private _readFromCacheAndRefresh(subscriber: Subscriber, url: string, clearTimeout?: number) {
-      subscriber.next(this._cachedData[url]);
+      subscriber.next(this._cachedData.get(url));
       this._showDevtool &&
-         this._updateDevtool(url, "❤️ Present in the cache", this._cachedData[url]);
-      this._observables[url](url).subscribe({
+         this._updateDevtool(url, "❤️ Present in the cache", this._cachedData.get(url));
+      this._observables.get(url)!(url).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {
-            this._cachedData[url] = res;
+            this._cachedData.set(url, res);
             subscriber.next(res);
             subscriber.complete();
             let messageText = "🔁 Refreshed";
@@ -140,10 +141,10 @@ export class CacheService {
    }
 
    private _fetch(subscriber: Subscriber, url: string, clearTimeout?: number) {
-      this._observables[url](url).subscribe({
+      this._observables.get(url)!(url).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {
-            this._cachedData[url] = res;
+            this._cachedData.set(url, res);
             subscriber.next(res);
             subscriber.complete();
             let messageText = "✅ Not present, fetched";
@@ -157,7 +158,7 @@ export class CacheService {
    }
 
    private _setClearTimeout(url: string, timeout: number, data: any) {
-      const oldTimeoutId = this._clearTimeouts[url];
+      const oldTimeoutId = this._clearTimeouts.get(url);
       if (oldTimeoutId) {
          // deleting the old one
          clearTimeout(oldTimeoutId);
@@ -165,14 +166,14 @@ export class CacheService {
       }
 
       const timeoutId = setTimeout(() => {
-         delete this._cachedData[url];
-         delete this._observables[url];
-         delete this._clearTimeouts[url];
+         this._cachedData.delete(url);
+         this._observables.delete(url);
+         this._clearTimeouts.delete(url);
          this._isDev && removeTimeoutFromLocalStorage(timeoutId as unknown as number);
          this._showDevtool && this._updateDevtool(url, "🗑 Removed by timeout", data);
       }, timeout);
       // setting a new one
-      this._clearTimeouts[url] = timeoutId as unknown as number;
+      this._clearTimeouts.set(url, timeoutId as unknown as number);
       this._isDev && addTimeoutToLocalStorage(timeoutId as unknown as number);
    }
 
@@ -198,10 +199,10 @@ export class CacheService {
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
       });
       matches.forEach((url, index) => {
-         delete this._cachedData[url];
-         delete this._observables[url];
-         clearTimeout(this._clearTimeouts[url]);
-         delete this._clearTimeouts[url];
+         this._cachedData.delete(url);
+         this._observables.delete(url);
+         clearTimeout(this._clearTimeouts.get(url));
+         this._clearTimeouts.delete(url);
          this._showDevtool &&
             this._updateDevtool(url, `🗑 Matched and removed (${index + 1}/${matches.length})`, {
                urlQuery,
@@ -212,9 +213,9 @@ export class CacheService {
 
    /** Resets the cache state */
    public resetCache() {
-      this._cachedData = {};
-      this._observables = {};
-      this._clearTimeouts = {};
+      this._cachedData = new Map();
+      this._observables = new Map();
+      this._clearTimeouts = new Map();
       this._showDevtool && this._updateDevtool("ALL", "RESET CACHE", "CACHE IS EMPTY.");
    }
 
@@ -223,14 +224,14 @@ export class CacheService {
    }
 
    get cachedData() {
-      return {...this._cachedData};
+      return mapToObject(this._cachedData);
    }
 
    get observables() {
-      return {...this._observables};
+      return mapToObject(this._observables);
    }
 
    get clearTimeouts() {
-      return {...this._clearTimeouts};
+      return mapToObject(this._clearTimeouts);
    }
 }
