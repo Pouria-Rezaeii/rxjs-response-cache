@@ -26,7 +26,8 @@
       "lint": "eslint . --ext .js,.ts && tsc --noEmit",
       "test": "jest --runInBand",
       "test:watch": "jest --watchAll",
-      "check": "npm run lint && npm run test"
+      "check-all": "npm run lint && npm run test",
+      "compile": "npm run check-all && tsc --project tsconfig.compile.json"
    },
    "devDependencies": {
       "@babel/preset-env": "^7.22.20",
