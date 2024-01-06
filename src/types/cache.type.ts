@@ -12,10 +12,33 @@ export type CacheConfigType = {
 };
 
 export type ObservableFunc = (url: string) => {
-   subscribe: (subscriber?: Partial<Subscriber>) => {
+   subscribe: (subscriber: PartialObserver<any>) => {
       unsubscribe(): void;
    };
 };
+
+interface NextObserver<T> {
+   closed?: boolean;
+   next: (value: T) => void;
+   error?: (err: any) => void;
+   complete?: () => void;
+}
+
+interface ErrorObserver<T> {
+   closed?: boolean;
+   next?: (value: T) => void;
+   error: (err: any) => void;
+   complete?: () => void;
+}
+
+interface CompletionObserver<T> {
+   closed?: boolean;
+   next?: (value: T) => void;
+   error?: (err: any) => void;
+   complete: () => void;
+}
+
+type PartialObserver<T> = NextObserver<T> | ErrorObserver<T> | CompletionObserver<T>;
 
 export type Subscriber = {
    next: (value: any) => void;
@@ -24,6 +47,7 @@ export type Subscriber = {
 };
 
 export type ObservableConfig = {
+   uniqueKey?: string;
    url: string;
    observable: ObservableFunc;
    refresh?: boolean;
