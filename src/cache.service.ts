@@ -25,9 +25,9 @@ import {mapToObject} from "./utils/map-to-object";
  * Multiple instances is supported, but the devtool SHOULD be used only for one instance at a time.
  * */
 export class CacheService {
-   private _isDev: boolean;
-   private _showDevtool: boolean;
-   private _config: CacheConfigType;
+   private readonly _isDev: boolean;
+   private readonly _showDevtool: boolean;
+   private readonly _config: CacheConfigType;
    private _cachedData = new Map<string, any>();
    private _clearTimeouts = new Map<string, number>();
    private _observables = new Map<string, ObservableFunc>();
@@ -71,7 +71,7 @@ export class CacheService {
     * @usageNote If using with typescript consider that the method accepts a generic type,
     *       and the generic type should also be contained within the Observable type
     *       (example: get<Observable<Post[]>>(params)). This is because the package
-    *       is zero dependency and and does not now which version of rxjs your going to pass in
+    *       is zero dependency and does not know which version of rxjs your going to pass in
     * @prop url --- the string part of the url (may also contain query strings)
     * @prop observable --- observable callback function (should return your observable function) ---
     *       it receives the rearranged url as argument
@@ -88,7 +88,7 @@ export class CacheService {
     * @returns a new brand observable
     */
    public get<T>(config: ObservableConfig): T {
-      const {url: _url, defaultParams, params, observable, refresh, clearTime} = config;
+      const {url: _url, uniqueKey, defaultParams, params, observable, refresh, clearTime} = config;
       const url = rearrangeUrl({
          url: _url,
          defaultParams,
@@ -166,11 +166,15 @@ export class CacheService {
       }
 
       const timeoutId = setTimeout(() => {
-         this._cachedData.delete(url);
-         this._observables.delete(url);
-         this._clearTimeouts.delete(url);
-         this._isDev && removeTimeoutFromLocalStorage(timeoutId as unknown as number);
-         this._showDevtool && this._updateDevtool(url, "🗑 Removed by timeout", data);
+         // check if data is not already removed by resetting the cache
+         // (to prevent the redundant devtool message)
+         if (this._cachedData.has(url)) {
+            this._cachedData.delete(url);
+            this._observables.delete(url);
+            this._clearTimeouts.delete(url);
+            this._isDev && removeTimeoutFromLocalStorage(timeoutId as unknown as number);
+            this._showDevtool && this._updateDevtool(url, "🗑 Removed by timeout", data);
+         }
       }, timeout);
       // setting a new one
       this._clearTimeouts.set(url, timeoutId as unknown as number);
@@ -180,7 +184,7 @@ export class CacheService {
    private _getRemovalTimeoutMessage(timeout: number) {
       const date = new Date();
       date.setMilliseconds(date.getMilliseconds() + timeout);
-      return `, 🕓 Removal timeout set for ${date.toLocaleTimeString()}`;
+      return `; 🕓 Removal timeout set for ${date.toLocaleTimeString()}`;
    }
 
    /**
@@ -216,7 +220,8 @@ export class CacheService {
       this._cachedData = new Map();
       this._observables = new Map();
       this._clearTimeouts = new Map();
-      this._showDevtool && this._updateDevtool("ALL", "RESET CACHE", "CACHE IS EMPTY.");
+      this._showDevtool && this._updateDevtool("ALL", "CACHE CLEARED", "CACHE IS EMPTY.");
+      this._isDev && clearAllTimeoutsInLocalStorage();
    }
 
    get config(): any {
