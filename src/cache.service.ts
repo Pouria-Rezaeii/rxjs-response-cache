@@ -3,7 +3,7 @@ import {
    ObservableFunc,
    ObservableConfig,
    Subscriber,
-   UrlQueryOptions,
+   CleanQueryOptions,
 } from "./types/cache.type";
 import {rearrangeUrl} from "./utils/rearrange-url";
 import {getMatchedKeys} from "./utils/get-matched-keys";
@@ -15,6 +15,7 @@ import {
 } from "./utils/timeout-utils";
 import {defaults} from "./defaults";
 import {mapToObject} from "./utils/map-to-object";
+import {uidSeparator} from "./constants/uid-separator";
 
 /**
  * @class Global caching service for rxjs GET method responses.
@@ -88,77 +89,83 @@ export class CacheService {
     * @returns a new brand observable
     */
    public get<T>(config: ObservableConfig): T {
-      const {url: _url, uniqueKey, defaultParams, params, observable, refresh, clearTime} = config;
+      const {uniqueIdentifier: uid, url: _rawUrl, refresh, clearTime} = config;
       const url = rearrangeUrl({
-         url: _url,
-         defaultParams,
-         params: params,
+         url: _rawUrl,
+         defaultParams: config.defaultParams,
+         params: config.params,
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
       });
-      this._observables.set(url, observable);
-      const isPresentInCache = this._cachedData.get(url);
+      const key = uid ? uid + uidSeparator + url : url;
+      this._observables.set(key, config.observable);
+      const isPresentInCache = this._cachedData.get(key);
 
       return new this._config.observableConstructor((subscriber) => {
          if (isPresentInCache && !refresh) {
-            this._readFromCache(subscriber, url, clearTime);
+            this._readFromCache(subscriber, key, clearTime);
          } else if (isPresentInCache && refresh) {
-            this._readFromCacheAndRefresh(subscriber, url, clearTime);
+            this._readFromCacheAndRefresh(subscriber, key, url, clearTime);
          } else {
-            this._fetch(subscriber, url, clearTime);
+            this._fetch(subscriber, key, url, clearTime);
          }
       });
    }
 
-   private _readFromCache(subscriber: Subscriber, url: string, clearTimeout?: number) {
-      subscriber.next(this._cachedData.get(url));
+   private _readFromCache(subscriber: Subscriber, key: string, clearTimeout?: number) {
+      subscriber.next(this._cachedData.get(key));
       subscriber.complete();
       let messageText = "❤️ Present in the cache";
-      if (clearTimeout && ![this._clearTimeouts.has(url)]) {
-         this._setClearTimeout(url, clearTimeout, this._cachedData.get(url));
+      if (clearTimeout && ![this._clearTimeouts.has(key)]) {
+         this._setClearTimeout(key, clearTimeout, this._cachedData.get(key));
          messageText += this._getRemovalTimeoutMessage(clearTimeout);
       }
-      this._showDevtool && this._updateDevtool(url, messageText, this._cachedData.get(url));
+      this._showDevtool && this._updateDevtool(key, messageText, this._cachedData.get(key));
    }
 
-   private _readFromCacheAndRefresh(subscriber: Subscriber, url: string, clearTimeout?: number) {
-      subscriber.next(this._cachedData.get(url));
+   private _readFromCacheAndRefresh(
+      subscriber: Subscriber,
+      key: string,
+      url: string,
+      clearTimeout?: number
+   ) {
+      subscriber.next(this._cachedData.get(key));
       this._showDevtool &&
-         this._updateDevtool(url, "❤️ Present in the cache", this._cachedData.get(url));
-      this._observables.get(url)!(url).subscribe({
+         this._updateDevtool(key, "❤️ Present in the cache", this._cachedData.get(key));
+      this._observables.get(key)!(url).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {
-            this._cachedData.set(url, res);
+            this._cachedData.set(key, res);
             subscriber.next(res);
             subscriber.complete();
             let messageText = "🔁 Refreshed";
             if (clearTimeout) {
-               this._setClearTimeout(url, clearTimeout, res);
+               this._setClearTimeout(key, clearTimeout, res);
                messageText += this._getRemovalTimeoutMessage(clearTimeout);
             }
-            this._showDevtool && this._updateDevtool(url, messageText, res);
+            this._showDevtool && this._updateDevtool(key, messageText, res);
          },
       });
    }
 
-   private _fetch(subscriber: Subscriber, url: string, clearTimeout?: number) {
-      this._observables.get(url)!(url).subscribe({
+   private _fetch(subscriber: Subscriber, key: string, url: string, clearTimeout?: number) {
+      this._observables.get(key)!(url).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {
-            this._cachedData.set(url, res);
+            this._cachedData.set(key, res);
             subscriber.next(res);
             subscriber.complete();
             let messageText = "✅ Not present, fetched";
             if (clearTimeout) {
-               this._setClearTimeout(url, clearTimeout, res);
+               this._setClearTimeout(key, clearTimeout, res);
                messageText += this._getRemovalTimeoutMessage(clearTimeout);
             }
-            this._showDevtool && this._updateDevtool(url, messageText, res);
+            this._showDevtool && this._updateDevtool(key, messageText, res);
          },
       });
    }
 
-   private _setClearTimeout(url: string, timeout: number, data: any) {
-      const oldTimeoutId = this._clearTimeouts.get(url);
+   private _setClearTimeout(key: string, timeout: number, data: any) {
+      const oldTimeoutId = this._clearTimeouts.get(key);
       if (oldTimeoutId) {
          // deleting the old one
          clearTimeout(oldTimeoutId);
@@ -168,16 +175,16 @@ export class CacheService {
       const timeoutId = setTimeout(() => {
          // check if data is not already removed by resetting the cache
          // (to prevent the redundant devtool message)
-         if (this._cachedData.has(url)) {
-            this._cachedData.delete(url);
-            this._observables.delete(url);
-            this._clearTimeouts.delete(url);
+         if (this._cachedData.has(key)) {
+            this._cachedData.delete(key);
+            this._observables.delete(key);
+            this._clearTimeouts.delete(key);
             this._isDev && removeTimeoutFromLocalStorage(timeoutId as unknown as number);
-            this._showDevtool && this._updateDevtool(url, "🗑 Removed by timeout", data);
+            this._showDevtool && this._updateDevtool(key, "🗑 Removed by timeout", data);
          }
       }, timeout);
       // setting a new one
-      this._clearTimeouts.set(url, timeoutId as unknown as number);
+      this._clearTimeouts.set(key, timeoutId as unknown as number);
       this._isDev && addTimeoutToLocalStorage(timeoutId as unknown as number);
    }
 
@@ -195,10 +202,11 @@ export class CacheService {
     * Before searching, query params will be sorted alphabetically and empty strings, null and undefined
     * values will be removed
     */
-   public clean(urlQuery: string, options?: UrlQueryOptions) {
+   public clean(url: string, options?: CleanQueryOptions) {
       const matches = getMatchedKeys({
          source: this._cachedData,
-         keyPart: urlQuery,
+         uniqueIdentifier: options?.uniqueIdentifier,
+         url,
          options: options,
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
       });
@@ -209,8 +217,8 @@ export class CacheService {
          this._clearTimeouts.delete(url);
          this._showDevtool &&
             this._updateDevtool(url, `🗑 Matched and removed (${index + 1}/${matches.length})`, {
-               urlQuery,
-               urlQueryOptions: options || {},
+               url,
+               cleanQueryOptions: options || {},
             });
       });
    }

@@ -47,7 +47,7 @@ export type Subscriber = {
 };
 
 export type ObservableConfig = {
-   uniqueKey?: string;
+   uniqueIdentifier?: string;
    url: string;
    observable: ObservableFunc;
    refresh?: boolean;
@@ -56,7 +56,8 @@ export type ObservableConfig = {
    defaultParams?: Record<string, string | number | boolean>;
 };
 
-export type UrlQueryOptions = {
+export type CleanQueryOptions = {
+   uniqueIdentifier?: string;
    exact?: boolean;
    queryParams?: Record<string, string | number | boolean>;
 };

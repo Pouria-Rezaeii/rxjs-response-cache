@@ -1,6 +1,7 @@
 import {ObservableConfig} from "../types/cache.type";
 import {defaults} from "../defaults";
 
+/* sorts params alphabetically and removes possible extra params */
 export function rearrangeUrl(inputs: {
    url: string;
    defaultParams?: ObservableConfig["defaultParams"];
