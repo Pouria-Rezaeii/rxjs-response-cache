@@ -60,7 +60,7 @@ export class CacheService {
          url: url,
          status: status,
          data: data,
-         cacheState: structuredClone(this._cachedData),
+         cacheState: mapToObject(this._cachedData),
       });
    }
 

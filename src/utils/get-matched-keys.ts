@@ -23,8 +23,11 @@ export function getMatchedKeys(params: {
       return Object.keys(sourceObject).filter((sourceKey) => sourceKey === key);
    } else {
       // temporarily ignoring query params
-      let matches = Object.keys(sourceObject).filter((sourceKey) =>
-         sourceKey.includes(key.split("?")[0])
+      let matches = Object.keys(sourceObject).filter(
+         // checking the uid and the url separately to make sure everything works correctly
+         // if some part in the middle is ignored by the user
+         // some_uid__companies/some_id will match with {url: some_id, uid: some_uid}
+         (sourceKey) => sourceKey.includes(uid || "") && sourceKey.includes(url.split("?")[0])
       );
       // check for query params
       if (key.split("?")[1]) {
