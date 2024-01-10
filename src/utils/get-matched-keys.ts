@@ -27,7 +27,13 @@ export function getMatchedKeys(params: {
          // checking the uid and the url separately to make sure everything works correctly
          // if some part in the middle is ignored by the user
          // some_uid__companies/some_id will match with {url: some_id, uid: some_uid}
-         (sourceKey) => sourceKey.includes(uid || "") && sourceKey.includes(url.split("?")[0])
+         (sourceKey) => {
+            if (uid) {
+               return sourceKey.includes(uid) && sourceKey.includes(url.split("?")[0]);
+            } else {
+               return !sourceKey.includes(uidSeparator) && sourceKey.includes(url.split("?")[0]);
+            }
+         }
       );
       // check for query params
       if (key.split("?")[1]) {

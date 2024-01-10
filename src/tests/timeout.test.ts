@@ -20,7 +20,7 @@ describe("Cache service timeouts", () => {
          cacheService.get<Observable<unknown>>({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
-            clearTime: 200,
+            clearTimeout: 200,
          })
       );
 
@@ -34,7 +34,7 @@ describe("Cache service timeouts", () => {
          cacheService.get<Observable<unknown>>({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
-            clearTime: 200,
+            clearTimeout: 200,
          })
       );
 
@@ -43,7 +43,7 @@ describe("Cache service timeouts", () => {
          cacheService.get<Observable<unknown>>({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
-            clearTime: 200,
+            clearTimeout: 200,
          })
       );
 
@@ -57,7 +57,7 @@ describe("Cache service timeouts", () => {
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
             refresh: true,
-            clearTime: 200,
+            clearTimeout: 200,
          })
       );
 
@@ -73,7 +73,7 @@ describe("Cache service timeouts", () => {
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
             refresh: true,
-            clearTime: 200,
+            clearTimeout: 200,
          })
       );
 
@@ -95,7 +95,7 @@ describe("Cache service timeouts", () => {
             url: postsUrl,
             observable: (url) => observableFunction(url),
             refresh: true,
-            clearTime: 300,
+            clearTimeout: 300,
          })
       );
       await pause(200);
@@ -105,7 +105,7 @@ describe("Cache service timeouts", () => {
             url: postsUrl,
             observable: (url) => observableFunction(url),
             refresh: true,
-            clearTime: 300,
+            clearTimeout: 300,
          })
       );
       await pause(200);

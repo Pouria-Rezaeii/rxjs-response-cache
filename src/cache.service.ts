@@ -89,7 +89,7 @@ export class CacheService {
     * @returns a new brand observable
     */
    public get<T>(config: ObservableConfig): T {
-      const {uniqueIdentifier: uid, url: _rawUrl, refresh, clearTime} = config;
+      const {uniqueIdentifier: uid, url: _rawUrl, refresh, clearTimeout} = config;
       const url = rearrangeUrl({
          url: _rawUrl,
          defaultParams: config.defaultParams,
@@ -102,11 +102,11 @@ export class CacheService {
 
       return new this._config.observableConstructor((subscriber) => {
          if (isPresentInCache && !refresh) {
-            this._readFromCache(subscriber, key, clearTime);
+            this._readFromCache(subscriber, key, clearTimeout);
          } else if (isPresentInCache && refresh) {
-            this._readFromCacheAndRefresh(subscriber, key, url, clearTime);
+            this._readFromCacheAndRefresh(subscriber, key, url, clearTimeout);
          } else {
-            this._fetch(subscriber, key, url, clearTime);
+            this._fetch(subscriber, key, url, clearTimeout);
          }
       });
    }

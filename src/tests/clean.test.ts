@@ -2,6 +2,7 @@ import {Observable, lastValueFrom} from "rxjs";
 import {CacheService} from "../cache.service";
 import {observableFunction} from "./utils/observable-function";
 import {postsUrl} from "./server/urls";
+import {posts} from "./server/posts";
 
 describe("Cache service clean method", () => {
    let cacheService: CacheService;
@@ -13,7 +14,7 @@ describe("Cache service clean method", () => {
       });
    });
 
-   it("Clears data, observable and clear timeout", async () => {
+   it("Clears data, observable and clear timeout correctly if is NOT provided uid in clean options", async () => {
       await lastValueFrom(
          cacheService.get<Observable<unknown>>({
             url: postsUrl,
@@ -21,11 +22,49 @@ describe("Cache service clean method", () => {
          })
       );
 
+      await lastValueFrom(
+         cacheService.get<Observable<unknown>>({
+            uniqueIdentifier: "some_uid",
+            url: postsUrl,
+            observable: (url) => observableFunction(url),
+            clearTimeout: 20000,
+         })
+      );
+
       cacheService.clean(postsUrl);
 
-      expect(cacheService.cachedData).toEqual({});
-      expect(cacheService.observables).toEqual({});
-      expect(cacheService.clearTimeouts).toEqual({});
+      const expectedKey = "some_uid__" + postsUrl;
+      expect(cacheService.cachedData).toEqual({
+         [expectedKey]: posts,
+      });
+      expect(cacheService.observables[expectedKey]).toBeTruthy();
+      expect(cacheService.clearTimeouts[expectedKey]).toBeTruthy();
+   });
+
+   it("Clears data, observable and clear timeout correctly if uid IS provided in clean options", async () => {
+      await lastValueFrom(
+         cacheService.get<Observable<unknown>>({
+            url: postsUrl,
+            observable: (url) => observableFunction(url),
+            clearTimeout: 20000,
+         })
+      );
+
+      await lastValueFrom(
+         cacheService.get<Observable<unknown>>({
+            uniqueIdentifier: "some_uid",
+            url: postsUrl,
+            observable: (url) => observableFunction(url),
+         })
+      );
+
+      cacheService.clean(postsUrl, {uniqueIdentifier: "some_uid"});
+
+      expect(cacheService.cachedData).toEqual({
+         [postsUrl]: posts,
+      });
+      expect(cacheService.observables[postsUrl]).toBeTruthy();
+      expect(cacheService.clearTimeouts[postsUrl]).toBeTruthy();
    });
 
    it("Accepts params in url ", async () => {

@@ -51,7 +51,7 @@ export type ObservableConfig = {
    url: string;
    observable: ObservableFunc;
    refresh?: boolean;
-   clearTime?: number;
+   clearTimeout?: number;
    params?: Record<string, string | number | boolean>;
    defaultParams?: Record<string, string | number | boolean>;
 };
