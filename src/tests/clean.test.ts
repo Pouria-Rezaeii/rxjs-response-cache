@@ -3,6 +3,7 @@ import {CacheService} from "../cache.service";
 import {observableFunction} from "./utils/observable-function";
 import {postsUrl} from "./server/urls";
 import {posts} from "./server/posts";
+import {uidSeparator} from "../constants/uid-separator";
 
 describe("Cache service clean method", () => {
    let cacheService: CacheService;
@@ -33,7 +34,7 @@ describe("Cache service clean method", () => {
 
       cacheService.clean(postsUrl);
 
-      const expectedKey = "some_uid__" + postsUrl;
+      const expectedKey = "some_uid" + uidSeparator + postsUrl;
       expect(cacheService.cachedData).toEqual({
          [expectedKey]: posts,
       });

@@ -3,6 +3,7 @@ import {CacheService} from "../cache.service";
 import {observableFunction} from "./utils/observable-function";
 import {currentCounterUrl, firstPostUrl, resetCounterUrl} from "./server/urls";
 import {posts} from "./server/posts";
+import {uidSeparator} from "../constants/uid-separator";
 
 describe("Cache service storing responses", () => {
    let cacheService: CacheService;
@@ -101,7 +102,7 @@ describe("Cache service storing responses", () => {
                observable: (url) => observableFunction(url),
             })
          );
-         const expectedKey = "some_uid__" + firstPostUrl;
+         const expectedKey = "some_uid" + uidSeparator + firstPostUrl;
 
          expect(response).toEqual(posts[0]);
          expect(cacheService.cachedData).toEqual({
@@ -127,7 +128,7 @@ describe("Cache service storing responses", () => {
             })
          );
 
-         const expectedKey = "some_uid__" + currentCounterUrl;
+         const expectedKey = "some_uid" + uidSeparator + currentCounterUrl;
 
          expect(anotherCall).toEqual({counter: 1});
          expect(cacheService.cachedData).toEqual({
@@ -155,7 +156,7 @@ describe("Cache service storing responses", () => {
             })
          );
 
-         const expectedKey = "some_uid__" + currentCounterUrl;
+         const expectedKey = "some_uid" + uidSeparator + currentCounterUrl;
 
          expect(cacheService.cachedData).toEqual({
             [expectedKey]: {counter: 1},
