@@ -12,13 +12,18 @@ import {defaults} from "./defaults";
 import {mapToObject} from "./utils/map-to-object";
 import {uidSeparator} from "./constants/uid-separator";
 
+// @see live demo on {@link https:bla.com}
+
 /**
- * @class Global caching service for rxjs GET responses.
- * @see how to use on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
- * @usageNote Instantiate the service at the root level of your application, and with the help
- * of the get method, store rxjs GET method responses in a global context,
- * and access them in any other place or any other time ---
- * Multiple instances is supported, but the devtool SHOULD be used only for one instance at a time.
+ * @description Global caching service for rxjs GET responses.
+ *
+ * @description Simply instantiate the service at any place of your application tree,
+ * and using service get method, store rxjs GET responses in the cache before starting to work with,
+ * and access them in any other place or any other time.
+ *
+ * @usageNote Multiple instances is supported, but the devtool SHOULD be used only for one instance at a time.
+ *
+ * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
  * */
 export class CacheService {
    private readonly _isDev: boolean;
@@ -29,11 +34,21 @@ export class CacheService {
    private _observables = new Map<string, ObservableConfig<any>["observable"]>();
 
    /**
-    * @see how to use on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
-    * @prop observableConstructor --- pass your version of Observable constructor exported from rxjs package
-    * @prop isDevMode --- if true, and devtool.show also equals true, the devtool will be attached to the body
-    * @prop paramsObjectOverwritesUrlQueries --- represent if params object should overwrite the query params in the url field, passed to the get method
-    * @prop devtool --- develop tool configuration. The Devtool lets you inspect the cache state and cache history
+    * @description Global caching service for rxjs GET responses.
+    *
+    * @description Simply instantiate the service at any place of your application tree,
+    * and using service get method, store rxjs GET responses in the cache before starting to work with,
+    * and access them in any other place or any other time.
+    *
+    * @usageNote Multiple instances is supported, but the devtool SHOULD be used only for one instance at a time.
+    *
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    *
+    * @param isDevMode --- if true, and devtool.show equals true either, the devtool will be attached to the body.
+    *
+    * @param paramsObjectOverwritesUrlQueries --- represent if params object should overwrite the query params in the url field, passed to the get method.
+    *
+    * @param devtool --- develop tool configuration. The Devtool lets you inspect the cache state and cache history.
     */
    constructor(config: CacheConfigType) {
       this._config = config;
@@ -60,27 +75,34 @@ export class CacheService {
    }
 
    /**
-    * @see examples on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
-    * @usageNote the method combines params, defaultParams and query strings contained in
-    *       the url, orders them alphabetically, removes the empty strings, null, and
-    *       undefined values and uses them as the key to store the response.
-    * @usageNote If using with typescript consider that the method accepts a generic type,
-    *       and the generic type should also be contained within the Observable type
-    *       (example: get<Observable<Post[]>>(params)). This is because the package
-    *       is zero dependency and does not know which version of rxjs your going to pass in
-    * @prop url --- the string part of the url (may also contain query strings)
-    * @prop observable --- observable callback function (should return your observable function) ---
-    *       it receives the rearranged url as argument
-    * @prop defaultParams --- the default query parameters which will be overwritten by
-    *       the url query strings or params field in the case of duplication ---
-    *       If your endpoint uses any default parameters, include them here to get the
-    *       best possible result
-    * @prop params --- query parameters (will overwrite the defaultParameters and
-    *       the url query strings by default)
-    * @prop refresh --- pass true if you want to get the refreshed data after the staled ---
-    *       If true, the observable.next function probably will be called twice, first time returns the
-    *       staled data (if exist), and the last time the refreshed.
-    * @prop clearTime --- the time offset in milliseconds that the cached data should be removed
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    *
+    * @usageNote the method combines params, defaultParams and query strings contained in the url, orders them alphabetically, removes the empty strings, and undefined values and uses them as the key to store the response.
+    *
+    * @param (uniqueIdentifier) --- optional param to be included in auto-generated key.
+    * To distinguish between same urls with different rxjs operators (check the tutorial).
+    *
+    * @param url --- the string part of the url (may also contain query strings).
+    *
+    * @param observable --- observable callback function.
+    * It receives the arranged url as argument which is the combination of url query strings,
+    * defaultParams and params parameters.
+    * --- Alphabetically sorted and possibly truncated.
+    *
+    * @param defaultParams --- the default query parameters which will be overwritten by
+    * the url query strings or params field in the case of duplication.
+    * --- If your endpoint uses any default parameters, include them here to get the
+    * best possible result
+    *
+    * @param params --- query parameters (will overwrite the defaultParameters and
+    * the url query strings by default)
+    *
+    * @param refresh --- pass true if you want to get the refreshed data after the staled.
+    * --- If true, the observable.next function probably will be called twice, first time returns the
+    * staled data (if exist), and the last time the refreshed.
+    *
+    * @param clearTime --- the time offset in milliseconds that the cached data should be removed
+    *
     * @returns a new brand observable
     */
    public get<T = unknown>(config: ObservableConfig<T>): Observable<T> {
@@ -191,11 +213,13 @@ export class CacheService {
 
    /**
     * Searches for all matched keys based on a given string key and deletes them from the cache
-    * @see examples on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
-    * @prop options.exact --- specifies if the search operation should be based on exact match or not
-    * @usageNote Query params can be included in both the key argument or the options.params property ---
-    * Before searching, query params will be sorted alphabetically and empty strings, null and undefined
-    * values will be removed
+    *
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    *
+    * @param options ---  the exact prop specifies if the search operation should be based on exact match or not
+    * --- params prop accepts query params.
+    *
+    * @usageNote Query params can be included in both the key argument or the options ((params)) property. Before searching, query params will be sorted and possibly truncated.
     */
    public clean(url: string, options?: CleanQueryOptions) {
       const matches = getMatchedKeys({
