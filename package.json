@@ -29,6 +29,9 @@
       "check-all": "npm run lint && npm run test",
       "compile": "npm run check-all && tsc --project tsconfig.compile.json"
    },
+   "peerDependencies": {
+      "rxjs": ">=5.0.0"
+   },
    "devDependencies": {
       "@babel/preset-env": "^7.22.20",
       "@babel/preset-typescript": "^7.22.15",

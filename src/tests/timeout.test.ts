@@ -11,13 +11,12 @@ describe("Cache service timeouts", () => {
       observableFunction(resetCounterUrl).subscribe();
       cacheService = new CacheService({
          isDevMode: false,
-         observableConstructor: Observable,
       });
    });
 
    it("Clears the data, observable and clear timeout after provided time if refresh=false.", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
             clearTimeout: 200,
@@ -31,7 +30,7 @@ describe("Cache service timeouts", () => {
 
    it("Clears the data, observable and clear timeout after provided time if refresh=false event if api is called several times.", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
             clearTimeout: 200,
@@ -40,7 +39,7 @@ describe("Cache service timeouts", () => {
 
       await pause(150);
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
             clearTimeout: 200,
@@ -53,7 +52,7 @@ describe("Cache service timeouts", () => {
 
    it("Refreshes the data and clear timeout after provided time if refresh=true.", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
             refresh: true,
@@ -69,7 +68,7 @@ describe("Cache service timeouts", () => {
       const oldTimeouts = cacheService.clearTimeouts;
 
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
             refresh: true,
@@ -91,7 +90,7 @@ describe("Cache service timeouts", () => {
 
    it("Clears the previous timeout if new timeout has been set.", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
             refresh: true,
@@ -101,7 +100,7 @@ describe("Cache service timeouts", () => {
       await pause(200);
 
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
             refresh: true,

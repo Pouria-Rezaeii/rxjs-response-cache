@@ -1,10 +1,5 @@
-import {
-   CacheConfigType,
-   ObservableFunc,
-   ObservableConfig,
-   Subscriber,
-   CleanQueryOptions,
-} from "./types/cache.type";
+import {CacheConfigType, ObservableConfig, CleanQueryOptions} from "./types/cache.type";
+import {Observable, Subscriber} from "rxjs";
 import {rearrangeUrl} from "./utils/rearrange-url";
 import {getMatchedKeys} from "./utils/get-matched-keys";
 import {attachDevtool, updateDevtool} from "./devtool";
@@ -18,7 +13,7 @@ import {mapToObject} from "./utils/map-to-object";
 import {uidSeparator} from "./constants/uid-separator";
 
 /**
- * @class Global caching service for rxjs GET method responses.
+ * @class Global caching service for rxjs GET responses.
  * @see how to use on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
  * @usageNote Instantiate the service at the root level of your application, and with the help
  * of the get method, store rxjs GET method responses in a global context,
@@ -31,7 +26,7 @@ export class CacheService {
    private readonly _config: CacheConfigType;
    private _cachedData = new Map<string, any>();
    private _clearTimeouts = new Map<string, number>();
-   private _observables = new Map<string, ObservableFunc>();
+   private _observables = new Map<string, ObservableConfig<any>["observable"]>();
 
    /**
     * @see how to use on {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
@@ -88,7 +83,7 @@ export class CacheService {
     * @prop clearTime --- the time offset in milliseconds that the cached data should be removed
     * @returns a new brand observable
     */
-   public get<T>(config: ObservableConfig): T {
+   public get<T = unknown>(config: ObservableConfig<T>): Observable<T> {
       const {uniqueIdentifier: uid, url: _rawUrl, refresh, clearTimeout} = config;
       const url = rearrangeUrl({
          url: _rawUrl,
@@ -100,7 +95,7 @@ export class CacheService {
       this._observables.set(key, config.observable);
       const isPresentInCache = this._cachedData.get(key);
 
-      return new this._config.observableConstructor((subscriber) => {
+      return new Observable<T>((subscriber) => {
          if (isPresentInCache && !refresh) {
             this._readFromCache(subscriber, key, clearTimeout);
          } else if (isPresentInCache && refresh) {
@@ -111,7 +106,7 @@ export class CacheService {
       });
    }
 
-   private _readFromCache(subscriber: Subscriber, key: string, clearTimeout?: number) {
+   private _readFromCache<T>(subscriber: Subscriber<T>, key: string, clearTimeout?: number) {
       subscriber.next(this._cachedData.get(key));
       subscriber.complete();
       let messageText = "❤️ Present in the cache";
@@ -122,8 +117,8 @@ export class CacheService {
       this._showDevtool && this._updateDevtool(key, messageText, this._cachedData.get(key));
    }
 
-   private _readFromCacheAndRefresh(
-      subscriber: Subscriber,
+   private _readFromCacheAndRefresh<T>(
+      subscriber: Subscriber<T>,
       key: string,
       url: string,
       clearTimeout?: number
@@ -147,7 +142,7 @@ export class CacheService {
       });
    }
 
-   private _fetch(subscriber: Subscriber, key: string, url: string, clearTimeout?: number) {
+   private _fetch<T>(subscriber: Subscriber<T>, key: string, url: string, clearTimeout?: number) {
       this._observables.get(key)!(url).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {

@@ -11,20 +11,19 @@ describe("Cache service clean method", () => {
    beforeEach(() => {
       cacheService = new CacheService({
          isDevMode: false,
-         observableConstructor: Observable,
       });
    });
 
    it("Clears data, observable and clear timeout correctly if is NOT provided uid in clean options", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
          })
       );
 
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             uniqueIdentifier: "some_uid",
             url: postsUrl,
             observable: (url) => observableFunction(url),
@@ -44,7 +43,7 @@ describe("Cache service clean method", () => {
 
    it("Clears data, observable and clear timeout correctly if uid IS provided in clean options", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
             clearTimeout: 500,
@@ -52,7 +51,7 @@ describe("Cache service clean method", () => {
       );
 
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             uniqueIdentifier: "some_uid",
             url: postsUrl,
             observable: (url) => observableFunction(url),
@@ -70,7 +69,7 @@ describe("Cache service clean method", () => {
 
    it("Accepts params in url ", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl.concat("?a=T"),
             observable: (url) => observableFunction(url),
          })
@@ -82,7 +81,7 @@ describe("Cache service clean method", () => {
 
    it("Accepts params in queryParams object", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl.concat("?a=T"),
             observable: (url) => observableFunction(url),
          })
@@ -95,13 +94,13 @@ describe("Cache service clean method", () => {
 
    it("Matches only one key if `exact=true` and query params are included in `url` parameter", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
          })
       );
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl.concat("?a=T"),
             observable: (url) => observableFunction(url),
          })
@@ -114,13 +113,13 @@ describe("Cache service clean method", () => {
 
    it("Matches only one key if `exact=true` and query params are included in `query param` parameter", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
          })
       );
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
          })
@@ -133,14 +132,14 @@ describe("Cache service clean method", () => {
 
    it("Matches as many as possible if `exact=false` and query params are included in `url` parameter", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl.concat("?a=T"),
             observable: (url) => observableFunction(url),
          })
       );
 
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl.concat("?a=T&b=T"),
             observable: (url) => observableFunction(url),
          })
@@ -152,14 +151,14 @@ describe("Cache service clean method", () => {
 
    it("Matches as many as possible if `exact=false` and query params are included in `query param` parameter", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl.concat("?a=T"),
             observable: (url) => observableFunction(url),
          })
       );
 
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl.concat("?a=T&b=T"),
             observable: (url) => observableFunction(url),
          })

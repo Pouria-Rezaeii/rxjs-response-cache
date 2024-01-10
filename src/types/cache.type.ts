@@ -1,55 +1,16 @@
 import {DevtoolConfig} from "../devtool/type";
-
-interface ObservableConstructor {
-   new (input?: (subscriber: Subscriber) => void): any;
-}
+import {Observable} from "rxjs";
 
 export type CacheConfigType = {
    isDevMode: boolean;
    paramsObjectOverwritesUrlQueries?: boolean;
-   observableConstructor: ObservableConstructor;
    devtool?: DevtoolConfig;
 };
 
-export type ObservableFunc = (url: string) => {
-   subscribe: (subscriber: PartialObserver<any>) => {
-      unsubscribe(): void;
-   };
-};
-
-interface NextObserver<T> {
-   closed?: boolean;
-   next: (value: T) => void;
-   error?: (err: any) => void;
-   complete?: () => void;
-}
-
-interface ErrorObserver<T> {
-   closed?: boolean;
-   next?: (value: T) => void;
-   error: (err: any) => void;
-   complete?: () => void;
-}
-
-interface CompletionObserver<T> {
-   closed?: boolean;
-   next?: (value: T) => void;
-   error?: (err: any) => void;
-   complete: () => void;
-}
-
-type PartialObserver<T> = NextObserver<T> | ErrorObserver<T> | CompletionObserver<T>;
-
-export type Subscriber = {
-   next: (value: any) => void;
-   error: (err: any) => void;
-   complete: () => void;
-};
-
-export type ObservableConfig = {
+export type ObservableConfig<T> = {
    uniqueIdentifier?: string;
    url: string;
-   observable: ObservableFunc;
+   observable: (url: string) => Observable<T>;
    refresh?: boolean;
    clearTimeout?: number;
    params?: Record<string, string | number | boolean>;

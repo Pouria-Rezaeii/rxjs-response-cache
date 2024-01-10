@@ -4,8 +4,8 @@ import {defaults} from "../defaults";
 /* sorts params alphabetically and removes possible extra params */
 export function rearrangeUrl(inputs: {
    url: string;
-   defaultParams?: ObservableConfig["defaultParams"];
-   params?: ObservableConfig["params"];
+   defaultParams?: ObservableConfig<unknown>["defaultParams"];
+   params?: ObservableConfig<unknown>["params"];
    paramsObjectOverwrites?: boolean;
 }) {
    const {

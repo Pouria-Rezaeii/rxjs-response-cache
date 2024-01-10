@@ -12,14 +12,13 @@ describe("Cache service storing responses", () => {
       observableFunction(resetCounterUrl).subscribe();
       cacheService = new CacheService({
          isDevMode: false,
-         observableConstructor: Observable,
       });
    });
 
    describe("Without any provided uid", () => {
       it("Fetches and stores the response and the observable correctly.", async () => {
          const response = await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: firstPostUrl,
                observable: (url) => observableFunction(url),
             })
@@ -34,14 +33,14 @@ describe("Cache service storing responses", () => {
 
       it("Uses the cache if data is already present and does not call the api again if `refresh=false`.", async () => {
          await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
             })
          );
 
          const anotherCall = await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
             })
@@ -55,7 +54,7 @@ describe("Cache service storing responses", () => {
 
       it("Uses the cache and refreshes the data correctly if `refresh=true`.", async () => {
          await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
             })
@@ -64,7 +63,7 @@ describe("Cache service storing responses", () => {
          // the cache is going to be used and the firstValueFrom will return counter = 1
          // the lastValueFrom would be 2 but there is no way to log it here
          await firstValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
                refresh: true,
@@ -79,7 +78,7 @@ describe("Cache service storing responses", () => {
          // but there is no way to log it here
          // we expect the lastValueFrom to be 3
          const anotherCallLastResponse = await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
                refresh: true,
@@ -96,7 +95,7 @@ describe("Cache service storing responses", () => {
    describe("Along with provided uid", () => {
       it("Fetches and stores the response and the observable correctly.", async () => {
          const response = await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                uniqueIdentifier: "some_uid",
                url: firstPostUrl,
                observable: (url) => observableFunction(url),
@@ -113,7 +112,7 @@ describe("Cache service storing responses", () => {
 
       it("Uses the cache if data is already present and does not call the api again if `refresh=false`.", async () => {
          await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
@@ -138,7 +137,7 @@ describe("Cache service storing responses", () => {
 
       it("Uses the cache and refreshes the data correctly if `refresh=true`.", async () => {
          await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
@@ -148,7 +147,7 @@ describe("Cache service storing responses", () => {
          // the cache is going to be used and the firstValueFrom will return counter = 1
          // the lastValueFrom would be 2 but there is no way to log it here
          await firstValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),
@@ -166,7 +165,7 @@ describe("Cache service storing responses", () => {
          // but there is no way to log it here
          // we expect the lastValueFrom to be 3
          const anotherCallLastResponse = await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: (url) => observableFunction(url),

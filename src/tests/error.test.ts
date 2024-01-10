@@ -11,14 +11,13 @@ describe("Cache service error handling", () => {
       observableFunction(resetCounterUrl).subscribe();
       cacheService = new CacheService({
          isDevMode: false,
-         observableConstructor: Observable,
       });
    });
 
    it("Throws the error correctly if request fails.", async () => {
       try {
          await firstValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: "/not-exist-rul",
                observable: (url) => observableFunction(url),
             })
@@ -30,14 +29,14 @@ describe("Cache service error handling", () => {
 
    it("Returns the cached date and throws the error correctly if refresh request fails.", async () => {
       await firstValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: currentCounterUrl,
             observable: (url) => observableFunction(url),
          })
       );
 
       const anotherCallFirstResponse = await firstValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: currentCounterUrl,
             refresh: true,
             observable: (url) => observableFunction(url, {throwError: true}),
@@ -47,7 +46,7 @@ describe("Cache service error handling", () => {
 
       try {
          await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                url: currentCounterUrl,
                refresh: true,
                observable: (url) => observableFunction(url, {throwError: true}),

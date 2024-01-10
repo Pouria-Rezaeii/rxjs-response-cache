@@ -9,13 +9,12 @@ describe("Cache service initialization", () => {
    beforeEach(() => {
       cacheService = new CacheService({
          isDevMode: false,
-         observableConstructor: Observable,
       });
    });
 
    it("Resets the cache correctly.", async () => {
       await lastValueFrom(
-         cacheService.get<Observable<unknown>>({
+         cacheService.get({
             url: postsUrl,
             observable: (url) => observableFunction(url),
          })

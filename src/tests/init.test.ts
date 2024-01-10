@@ -6,7 +6,6 @@ describe("Cache service initialization", () => {
    let cacheService: CacheService;
    const config: CacheConfigType = {
       isDevMode: false,
-      observableConstructor: Observable,
       paramsObjectOverwritesUrlQueries: false,
       devtool: {
          show: false,
