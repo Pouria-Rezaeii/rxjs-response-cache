@@ -48,8 +48,7 @@ export function rearrangeUrl(inputs: {
    const formattedQueryParams = Object.keys(finalParams)
       .filter(
          (key) =>
-            finalParams[key] &&
-            !["", "''", '""', "undefined", "null"].includes(finalParams[key].toString())
+            finalParams[key] && !["", "''", '""', "undefined"].includes(finalParams[key].toString())
       )
       .sort((a, b) => a.localeCompare(b))
       .map((key) => key + "=" + finalParams[key].toString())

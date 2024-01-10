@@ -96,7 +96,7 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Removes the null, undefined and empty strings and empty lists in query params.", async () => {
+   it("Removes the undefined and empty strings and empty lists in query params.", async () => {
       const expectedUrl = postsUrl.concat("?a=T&f=T");
 
       await lastValueFrom(
@@ -106,8 +106,8 @@ describe("Cache service rearranging url parameters", () => {
                expect(url).toEqual(expectedUrl);
                return observableFunction(url);
             },
-            defaultParams: {v: "null"},
-            params: {g: "null", i: ""},
+            defaultParams: {v: "undefined"},
+            params: {g: "undefined", i: ""},
          })
       );
 
@@ -179,7 +179,7 @@ describe("Cache service rearranging url parameters", () => {
 
       await lastValueFrom(
          cacheService.get<Observable<unknown>>({
-            url: postsUrl.concat("?m=null&z=T&k=&c=T&"),
+            url: postsUrl.concat("?z=T&k=&c=T&"),
             observable: (url) => observableFunction(url),
             params: {f: "undefined", g: "T"},
          })
