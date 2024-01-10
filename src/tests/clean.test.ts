@@ -27,7 +27,7 @@ describe("Cache service clean method", () => {
             uniqueIdentifier: "some_uid",
             url: postsUrl,
             observable: (url) => observableFunction(url),
-            clearTimeout: 20000,
+            clearTimeout: 500,
          })
       );
 
@@ -46,7 +46,7 @@ describe("Cache service clean method", () => {
          cacheService.get<Observable<unknown>>({
             url: postsUrl,
             observable: (url) => observableFunction(url),
-            clearTimeout: 20000,
+            clearTimeout: 500,
          })
       );
 
