@@ -18,7 +18,7 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
@@ -26,7 +26,7 @@ describe("Cache service clean method", () => {
          cacheService.get({
             uniqueIdentifier: "some_uid",
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             clearTimeout: 500,
          })
       );
@@ -45,7 +45,7 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             clearTimeout: 500,
          })
       );
@@ -54,7 +54,7 @@ describe("Cache service clean method", () => {
          cacheService.get({
             uniqueIdentifier: "some_uid",
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
@@ -71,7 +71,7 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
@@ -83,7 +83,7 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
@@ -96,13 +96,13 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
       cacheService.clean(postsUrl, {exact: true});
@@ -115,13 +115,13 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
       cacheService.clean(postsUrl, {exact: true, queryParams: {a: "T"}});
@@ -134,14 +134,14 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T&b=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
@@ -153,14 +153,14 @@ describe("Cache service clean method", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T&b=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 

@@ -16,7 +16,7 @@ describe("Cache service initialization", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 

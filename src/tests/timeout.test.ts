@@ -18,7 +18,7 @@ describe("Cache service timeouts", () => {
       await lastValueFrom(
          cacheService.get({
             url: currentCounterUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             clearTimeout: 200,
          })
       );
@@ -32,7 +32,7 @@ describe("Cache service timeouts", () => {
       await lastValueFrom(
          cacheService.get({
             url: currentCounterUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             clearTimeout: 200,
          })
       );
@@ -41,7 +41,7 @@ describe("Cache service timeouts", () => {
       await lastValueFrom(
          cacheService.get({
             url: currentCounterUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             clearTimeout: 200,
          })
       );
@@ -54,7 +54,7 @@ describe("Cache service timeouts", () => {
       await lastValueFrom(
          cacheService.get({
             url: currentCounterUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             refresh: true,
             clearTimeout: 200,
          })
@@ -70,7 +70,7 @@ describe("Cache service timeouts", () => {
       await lastValueFrom(
          cacheService.get({
             url: currentCounterUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             refresh: true,
             clearTimeout: 200,
          })
@@ -92,7 +92,7 @@ describe("Cache service timeouts", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             refresh: true,
             clearTimeout: 300,
          })
@@ -102,7 +102,7 @@ describe("Cache service timeouts", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             refresh: true,
             clearTimeout: 300,
          })

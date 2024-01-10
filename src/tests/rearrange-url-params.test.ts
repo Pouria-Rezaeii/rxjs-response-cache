@@ -18,7 +18,7 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
@@ -31,7 +31,7 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             defaultParams: {a: "T"},
          })
       );
@@ -45,7 +45,7 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             params: {a: "T"},
          })
       );
@@ -61,9 +61,9 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?g=T&a=T&z=T&"),
-            observable: (url) => {
-               expect(url).toEqual(expectedUrl);
-               return observableFunction(url);
+            observable: ({arrangedUrl}) => {
+               expect(arrangedUrl).toEqual(expectedUrl);
+               return observableFunction(arrangedUrl);
             },
             defaultParams: {m: "T"},
             params: {v: "T", b: "T"},
@@ -81,9 +81,9 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T"),
-            observable: (url) => {
-               expect(url).toEqual(expectedUrl);
-               return observableFunction(url);
+            observable: ({arrangedUrl}) => {
+               expect(arrangedUrl).toEqual(expectedUrl);
+               return observableFunction(arrangedUrl);
             },
             defaultParams: {a: "a", b: "b", f: "T"},
             params: {b: "T"},
@@ -101,9 +101,9 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat('?a=T&c=undefined&d=""&e=&f=T&'),
-            observable: (url) => {
-               expect(url).toEqual(expectedUrl);
-               return observableFunction(url);
+            observable: ({arrangedUrl}) => {
+               expect(arrangedUrl).toEqual(expectedUrl);
+               return observableFunction(arrangedUrl);
             },
             defaultParams: {v: "undefined"},
             params: {g: "undefined", i: ""},
@@ -126,9 +126,9 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?page-size=10"),
-            observable: (url) => {
-               expect(url).toEqual(expectedUrl);
-               return observableFunction(url);
+            observable: ({arrangedUrl}) => {
+               expect(arrangedUrl).toEqual(expectedUrl);
+               return observableFunction(arrangedUrl);
             },
             params: {"page-size": "20"},
          })
@@ -150,9 +150,9 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?page-size=10"),
-            observable: (url) => {
-               expect(url).toEqual(expectedUrl);
-               return observableFunction(url);
+            observable: ({arrangedUrl}) => {
+               expect(arrangedUrl).toEqual(expectedUrl);
+               return observableFunction(arrangedUrl);
             },
             params: {"page-size": "20"},
          })
@@ -169,7 +169,7 @@ describe("Cache service rearranging url parameters", () => {
       await firstValueFrom(
          cacheService.get({
             url: postsUrl.concat("?z=T&g=T"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             params: {c: "T"},
          })
       );
@@ -177,7 +177,7 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?z=T&k=&c=T&"),
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             params: {f: "undefined", g: "T"},
          })
       );

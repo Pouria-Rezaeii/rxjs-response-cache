@@ -20,7 +20,7 @@ describe("Cache service storing responses", () => {
          const response = await lastValueFrom(
             cacheService.get({
                url: firstPostUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
@@ -35,14 +35,14 @@ describe("Cache service storing responses", () => {
          await lastValueFrom(
             cacheService.get({
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
          const anotherCall = await lastValueFrom(
             cacheService.get({
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
@@ -56,7 +56,7 @@ describe("Cache service storing responses", () => {
          await lastValueFrom(
             cacheService.get({
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
@@ -65,7 +65,7 @@ describe("Cache service storing responses", () => {
          await firstValueFrom(
             cacheService.get({
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
                refresh: true,
             })
          );
@@ -80,7 +80,7 @@ describe("Cache service storing responses", () => {
          const anotherCallLastResponse = await lastValueFrom(
             cacheService.get({
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
                refresh: true,
             })
          );
@@ -98,7 +98,7 @@ describe("Cache service storing responses", () => {
             cacheService.get({
                uniqueIdentifier: "some_uid",
                url: firstPostUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
          const expectedKey = "some_uid" + uidSeparator + firstPostUrl;
@@ -115,7 +115,7 @@ describe("Cache service storing responses", () => {
             cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
@@ -123,7 +123,7 @@ describe("Cache service storing responses", () => {
             cacheService.get<Observable<unknown>>({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
@@ -140,7 +140,7 @@ describe("Cache service storing responses", () => {
             cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
@@ -150,7 +150,7 @@ describe("Cache service storing responses", () => {
             cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
                refresh: true,
             })
          );
@@ -168,7 +168,7 @@ describe("Cache service storing responses", () => {
             cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
                refresh: true,
             })
          );

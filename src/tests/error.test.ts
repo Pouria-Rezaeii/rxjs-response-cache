@@ -19,7 +19,7 @@ describe("Cache service error handling", () => {
          await firstValueFrom(
             cacheService.get({
                url: "/not-exist-rul",
-               observable: (url) => observableFunction(url),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
       } catch (error) {
@@ -31,7 +31,7 @@ describe("Cache service error handling", () => {
       await firstValueFrom(
          cacheService.get({
             url: currentCounterUrl,
-            observable: (url) => observableFunction(url),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
@@ -39,7 +39,7 @@ describe("Cache service error handling", () => {
          cacheService.get({
             url: currentCounterUrl,
             refresh: true,
-            observable: (url) => observableFunction(url, {throwError: true}),
+            observable: ({arrangedUrl}) => observableFunction(arrangedUrl, {throwError: true}),
          })
       );
       expect(anotherCallFirstResponse).toEqual({counter: 1});
@@ -49,7 +49,7 @@ describe("Cache service error handling", () => {
             cacheService.get({
                url: currentCounterUrl,
                refresh: true,
-               observable: (url) => observableFunction(url, {throwError: true}),
+               observable: ({arrangedUrl}) => observableFunction(arrangedUrl, {throwError: true}),
             })
          );
       } catch (error) {

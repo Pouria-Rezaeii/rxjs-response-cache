@@ -126,7 +126,7 @@ export class CacheService {
       subscriber.next(this._cachedData.get(key));
       this._showDevtool &&
          this._updateDevtool(key, "❤️ Present in the cache", this._cachedData.get(key));
-      this._observables.get(key)!(url).subscribe({
+      this._observables.get(key)!({arrangedUrl: url}).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {
             this._cachedData.set(key, res);
@@ -143,7 +143,7 @@ export class CacheService {
    }
 
    private _fetch<T>(subscriber: Subscriber<T>, key: string, url: string, clearTimeout?: number) {
-      this._observables.get(key)!(url).subscribe({
+      this._observables.get(key)!({arrangedUrl: url}).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {
             this._cachedData.set(key, res);

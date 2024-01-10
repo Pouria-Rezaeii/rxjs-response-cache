@@ -10,7 +10,7 @@ export type CacheConfigType = {
 export type ObservableConfig<T> = {
    uniqueIdentifier?: string;
    url: string;
-   observable: (url: string) => Observable<T>;
+   observable: (params: {arrangedUrl: string}) => Observable<T>;
    refresh?: boolean;
    clearTimeout?: number;
    params?: Record<string, string | number | boolean>;
