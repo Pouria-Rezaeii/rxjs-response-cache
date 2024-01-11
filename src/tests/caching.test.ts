@@ -120,7 +120,7 @@ describe("Cache service storing responses", () => {
          );
 
          const anotherCall = await lastValueFrom(
-            cacheService.get<Observable<unknown>>({
+            cacheService.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
