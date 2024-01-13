@@ -286,9 +286,9 @@ See <a href="#devtool-params">Devtool Available  Parameters<a/>
 |:----------------------------------|:----------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | isDevMode                         | boolean         | In dev mode, clear timeouts will be stored in local storage to be cleared in possible hot-reloads.This will make sure that the devtool will not show wrong information from previous loads in developer mode. Also, devtool is available only in dev mode.                                                                 |
 | paramsObjectOverwrites-<br/>UrlQueries | boolean [=true] | Indicates how the service should behave if a query parameter is accidentally present in both <code>url</code> parameter as well as in <code>params</code> parameter.<br/>Example: cacheService.get({url: "/posts?page=2", params: {page: 3}}}, observable:() => observable) by default will be resolved to "/post?page=3". |
-| ignoreNullValues                  | boolean [=true] | Indicates whether null values should be removed from query params.                                                                                                                                                                                                                                                         |
+| removeNullValues                  | boolean [=true] | Indicates whether null values should be removed from query params.                                                                                                                                                                                                                                                         |
 | devtool                           | object [:?]     | Developer tool configuration. See <a href="#devtool-params">Devtool Available  Parameters<a/>.                                                                                                                                                                                                                             |
-&nbsp;
+<br></br>
 
 #### <section id="instance-params"> Service Instance Methods & Parameters </section>
 
@@ -301,7 +301,7 @@ See <a href="#devtool-params">Devtool Available  Parameters<a/>
 | cachedData   | object   | The stored data.                                               |
 | observables | object   | The stored observable.                                         |
 | clearTimeouts | object   | The active clear timeouts.                                     |
-&nbsp;
+<br></br>
 
 #### <section id="get-params"> Get Method Parameters </section>
 
@@ -314,7 +314,7 @@ See <a href="#devtool-params">Devtool Available  Parameters<a/>
 | params           | object [:?]      | Query parameters.                                                                                                         |
 | refresh          | boolean [=false] | Indicated if the data should be refreshed on next calls or not.                                                           |
 | clearTimeout     | number [?:]      | The time in milliseconds which be used to remove the data from the cache.                                                 |
-&nbsp;
+<br></br>
 
 #### <section id="clean-params"> Clean Method Parameters </section>
 

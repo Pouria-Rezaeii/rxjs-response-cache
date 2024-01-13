@@ -101,7 +101,7 @@ export class CacheService {
     * --- If true, the observable.next function probably will be called twice, first time returns the
     * staled data (if exist), and the last time the refreshed.
     *
-    * @param clearTime --- the time offset in milliseconds that the cached data should be removed
+    * @param clearTimeout --- the time offset in milliseconds that the cached data should be removed
     *
     * @returns a new brand observable
     */
@@ -112,6 +112,7 @@ export class CacheService {
          defaultParams: config.defaultParams,
          params: config.params,
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
+         removeNullValues: this._config.removeNullValues,
       });
       const key = uid ? uid + uidSeparator + url : url;
       this._observables.set(key, config.observable);
@@ -228,6 +229,7 @@ export class CacheService {
          url,
          options: options,
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
+         removeNullValues: this._config.removeNullValues,
       });
       matches.forEach((url, index) => {
          this._cachedData.delete(url);

@@ -7,13 +7,20 @@ export function rearrangeUrl(inputs: {
    defaultParams?: ObservableConfig<unknown>["defaultParams"];
    params?: ObservableConfig<unknown>["params"];
    paramsObjectOverwrites?: boolean;
+   removeNullValues?: boolean;
 }) {
    const {
       url: _url,
       defaultParams,
       params,
       paramsObjectOverwrites = defaults.paramsObjectOverwrites,
+      removeNullValues = defaults.removeNullValues,
    } = inputs;
+
+   const removable = ["", "''", '""', "undefined"];
+   if (removeNullValues) {
+      removable.push("null");
+   }
 
    const splitUrl = _url.split("?");
    const apiAddress = splitUrl[0];
@@ -46,11 +53,10 @@ export function rearrangeUrl(inputs: {
         };
 
    const formattedQueryParams = Object.keys(finalParams)
-      .filter(
-         (key) =>
-            finalParams[key] && !["", "''", '""', "undefined"].includes(finalParams[key].toString())
-      )
+      // removing redundant values
+      .filter((key) => finalParams[key] && !removable.includes(finalParams[key].toString()))
       .sort((a, b) => a.localeCompare(b))
+      // joining key value pairs
       .map((key) => key + "=" + finalParams[key].toString())
       .join("&");
 

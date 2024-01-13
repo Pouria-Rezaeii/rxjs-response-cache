@@ -1,5 +1,6 @@
 export const defaults = {
    paramsObjectOverwrites: true,
+   removeNullValues: true,
    devtool: {
       show: true,
       isOpenInitially: false,

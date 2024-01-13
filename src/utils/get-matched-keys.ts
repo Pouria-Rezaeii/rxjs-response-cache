@@ -9,13 +9,23 @@ export function getMatchedKeys(params: {
    url: string;
    options?: CleanQueryOptions;
    paramsObjectOverwrites?: boolean;
+   removeNullValues?: boolean;
 }) {
-   const {source, uniqueIdentifier: uid, url, options, paramsObjectOverwrites} = params;
+   const {
+      source,
+      uniqueIdentifier: uid,
+      url,
+      options,
+      paramsObjectOverwrites,
+      removeNullValues,
+   } = params;
+
    const sourceObject = mapToObject(source);
    const rearrangedUrl = rearrangeUrl({
       url,
       params: options?.queryParams,
       paramsObjectOverwrites,
+      removeNullValues,
    });
    const key = uid ? uid + uidSeparator + rearrangedUrl : rearrangedUrl;
 

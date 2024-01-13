@@ -1,5 +1,5 @@
 import {CacheService} from "../cache.service";
-import {lastValueFrom, firstValueFrom, Observable} from "rxjs";
+import {lastValueFrom, firstValueFrom} from "rxjs";
 import {posts} from "./server/posts";
 import {observableFunction} from "./utils/observable-function";
 import {resetCounterUrl, postsUrl} from "./server/urls";
@@ -95,18 +95,41 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Removes the undefined and empty strings and empty lists in query params.", async () => {
-      const expectedUrl = postsUrl.concat("?a=T&f=T");
+   it("Removes the undefined and empty strings and empty lists and nulls in query params.", async () => {
+      const expectedUrl = postsUrl.concat("?a=T");
 
       await lastValueFrom(
          cacheService.get({
-            url: postsUrl.concat('?a=T&c=undefined&d=""&e=&f=T&'),
+            url: postsUrl.concat('?a=T&b=undefined&c=""&d=&e=null&'),
             observable: ({arrangedUrl}) => {
                expect(arrangedUrl).toEqual(expectedUrl);
                return observableFunction(arrangedUrl);
             },
-            defaultParams: {v: "undefined"},
-            params: {g: "undefined", i: ""},
+            defaultParams: {f: "undefined"},
+            params: {g: "undefined", h: "", i: "null"},
+         })
+      );
+
+      expect(cacheService.cachedData).toEqual({
+         [expectedUrl]: posts,
+      });
+   });
+
+   it("Does not remove the null values if `removeNullValues = false`.", async () => {
+      cacheService = new CacheService({
+         isDevMode: false,
+         removeNullValues: false,
+      });
+
+      const expectedUrl = postsUrl.concat("?a=T&b=null");
+
+      await lastValueFrom(
+         cacheService.get({
+            url: postsUrl.concat("?a=T&b=null"),
+            observable: ({arrangedUrl}) => {
+               expect(arrangedUrl).toEqual(expectedUrl);
+               return observableFunction(arrangedUrl);
+            },
          })
       );
 

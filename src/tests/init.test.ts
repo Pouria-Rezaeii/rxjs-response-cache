@@ -1,4 +1,3 @@
-import {Observable} from "rxjs";
 import {CacheService} from "../cache.service";
 import {CacheConfigType} from "../types/cache.type";
 
@@ -7,6 +6,7 @@ describe("Cache service initialization", () => {
    const config: CacheConfigType = {
       isDevMode: false,
       paramsObjectOverwritesUrlQueries: false,
+      removeNullValues: false,
       devtool: {
          show: false,
          isOpenInitially: false,
