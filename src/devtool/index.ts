@@ -213,6 +213,7 @@ function createListItem(number: number, params: DevtoolHistoryListItem) {
       class: "devtool-button",
       styles: styles.itemButton,
       onClick: () => console.log(data),
+      title: "Log data in the console",
    });
 
    const cacheButton = createElement({
@@ -220,6 +221,7 @@ function createListItem(number: number, params: DevtoolHistoryListItem) {
       class: "devtool-button",
       styles: styles.itemButton,
       onClick: () => console.log(cacheState),
+      title: "Log cache state in the console",
    });
 
    itemButtonsBox.appendChild(dataButton);
