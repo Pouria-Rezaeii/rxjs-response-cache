@@ -12,18 +12,14 @@ import {defaults} from "./defaults";
 import {mapToObject} from "./utils/map-to-object";
 import {uidSeparator} from "./constants/uid-separator";
 
-// @see live demo on {@link https:bla.com}
-
 /**
- * @description Global caching service for rxjs GET responses.
+ * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service}
  *
- * @description Simply instantiate the service at any place of your application tree,
- * and using service get method, store rxjs GET responses in the cache before starting to work with,
- * and access them in any other place or any other time.
+ * @usageNote Multiple instances is supported, but the devtool SHOULD be used with one instance at a time
  *
- * @usageNote Multiple instances is supported, but the devtool SHOULD be used only for one instance at a time.
+ * @description Global caching service for RxRS GET responses.
  *
- * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+ * @description Instantiate the cache service at the root of your application or any other location within the components tree.
  * */
 export class CacheService {
    private readonly _isDev: boolean;
@@ -34,21 +30,24 @@ export class CacheService {
    private _observables = new Map<string, ObservableConfig<any>["observable"]>();
 
    /**
-    * @description Global caching service for rxjs GET responses.
+    * @description Global caching service for RxJS GET responses.
     *
-    * @description Simply instantiate the service at any place of your application tree,
-    * and using service get method, store rxjs GET responses in the cache before starting to work with,
-    * and access them in any other place or any other time.
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#usage}
     *
-    * @usageNote Multiple instances is supported, but the devtool SHOULD be used only for one instance at a time.
+    * @usageNote Multiple instances is supported, but the devtool SHOULD be used with one instance at a time
     *
-    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    * @description Instantiate the cache service at the root of your application or any other location within the components tree.
     *
-    * @param isDevMode --- if true, and devtool.show equals true either, the devtool will be attached to the body.
+    * @description <br/>Use the service's <b>`get()</b> method to store RxJS GET responses in the cache before starting to work with them.
+    * Access the cached data from any other place or at any other time.
     *
-    * @param paramsObjectOverwritesUrlQueries --- represent if params object should overwrite the query params in the url field, passed to the get method.
+    * @param isDevMode --- In dev mode, clear timeout IDs will be stored in local storage to be cleared in possible hot-reloads.This ensures that the devtool does not display incorrect information from previous loads during development.<br/><br/><b>Additionally</b>, the devtool is available only in dev mode.
     *
-    * @param devtool --- develop tool configuration. The Devtool lets you inspect the cache state and cache history.
+    * @param paramsObjectOverwritesUrlQueries --- [ default=true ] Determines how the service should behave if a query parameter is accidentally present in both the url parameter and the params parameter.<br/><br/><b>Example</b>: `cacheService.get({url: "/posts?page=2", params: {page: 3}, observable:() => observable})` <b>by default will be resolved to</b> `"/post?page=3"`.
+    *
+    * @param removeNullValues --- [ default=true ] Determines whether null values should be removed from query parameters or not.
+    *
+    * @param devtool --- Developer tool configuration. See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#devtool-params">Devtool Available  Parameters</a>.
     */
    constructor(config: CacheConfigType) {
       this._config = config;
@@ -75,35 +74,27 @@ export class CacheService {
    }
 
    /**
-    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#usage}
     *
     * @usageNote the method combines params, defaultParams and query strings contained in the url, orders them alphabetically, removes the empty strings, and undefined values and uses them as the key to store the response.
     *
-    * @param (uniqueIdentifier) --- optional param to be included in auto-generated key.
-    * To distinguish between same urls with different rxjs operators (check the tutorial).
+    * @description Fetches data and stores the expected result in the cache.
     *
-    * @param url --- the string part of the url (may also contain query strings).
+    * @param url --- The endpoint address (may include query parameters or not).
     *
-    * @param observable --- observable callback function.
-    * It receives the arranged url as argument which is the combination of url query strings,
-    * defaultParams and params parameters.
-    * --- Alphabetically sorted and possibly truncated.
+    * @param observable --- The callback function that returns an observable. It receives an object containing the `arrangedUrl` as input.<br/>See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#structure"> Cache Structure and Auto-Generated Keys </a> for details.
     *
-    * @param defaultParams --- the default query parameters which will be overwritten by
-    * the url query strings or params field in the case of duplication.
-    * --- If your endpoint uses any default parameters, include them here to get the
-    * best possible result
+    * @param (uniqueIdentifier) --- This value, if present, will be added to the auto-generated key for storing the data.<br/>See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#uid"> When to Use Unique Identifier </a>.
     *
-    * @param params --- query parameters (will overwrite the defaultParameters and
-    * the url query strings by default)
+    * @param defaultParams --- The API's default query parameters.<br/>To optimize cache results, ensure to include them if they can be altered by the end-user.
     *
-    * @param refresh --- pass true if you want to get the refreshed data after the staled.
-    * --- If true, the observable.next function probably will be called twice, first time returns the
-    * staled data (if exist), and the last time the refreshed.
+    * @param params --- The queryParams will overwrite the defaultParams, and by default (configurable), any query strings in the url parameter will also be overwritten.
     *
-    * @param clearTimeout --- the time offset in milliseconds that the cached data should be removed
+    * @param refresh --- Determines if the data should be refreshed on the next calls or not.<br/>By default, the API will be called only once.
     *
-    * @returns a new brand observable
+    * @param clearTimeout --- The time in milliseconds used to remove the data from the cache.
+    *
+    * @returns a new brand observable --- check this <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#refresh"> Link </a> for more details.
     */
    public get<T = unknown>(config: ObservableConfig<T>): Observable<T> {
       const {uniqueIdentifier: uid, url: _rawUrl, refresh, clearTimeout} = config;
@@ -213,14 +204,22 @@ export class CacheService {
    }
 
    /**
-    * Searches for all matched keys based on a given string key and deletes them from the cache
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#clean}
     *
-    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme}
+    * @usageNote Query params can be included in both the key argument or the `options.params` parameter. Before searching, query params will be sorted and possibly truncated.
     *
-    * @param options ---  the exact prop specifies if the search operation should be based on exact match or not
-    * --- params prop accepts query params.
+    * @description Allows you to remove specific data or multiple entries from the cache
     *
-    * @usageNote Query params can be included in both the key argument or the options ((params)) property. Before searching, query params will be sorted and possibly truncated.
+    * @param url ---  The endpoint address (may include query parameters or not).<br/><b>DO NOT</b> include the `uniqueIdentifier` part here.
+    *
+    * @param options ---  Extra options for cleaning.
+    *
+    * @param exact ---  [ <b>available on `options`</b> ] Determines if the query should be based on an exact match or not.
+    *
+    * @param uniqueIdentifier --- [ <b>available on `options`</b> ] Unique identifier.<br/><b>Note</b>: If the key includes a unique identifier, you should pass it here, even if the query is not based on an exact match.
+    *
+    * @param queryParams ---  [ <b>available on `options`</b> ] Query Parameters. They will be sorted and truncated if they contain an empty string, undefined, or null (null is configurable).
+    *
     */
    public clean(url: string, options?: CleanQueryOptions) {
       const matches = getMatchedKeys({
@@ -244,7 +243,7 @@ export class CacheService {
       });
    }
 
-   /** Resets the cache state */
+   /** Clears the entire cache. */
    public resetCache() {
       this._cachedData = new Map();
       this._observables = new Map();
@@ -253,6 +252,7 @@ export class CacheService {
       this._isDev && clearAllTimeoutsInLocalStorage();
    }
 
+   /** Configuration passed to the service.  */
    get config(): any {
       return {...this._config};
    }
