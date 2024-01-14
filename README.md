@@ -1,65 +1,80 @@
-## Rxjs Cache Service
-A lightweight ( 18kb gZipped ), zero-dependency client-side package that
-lets you cache rxjs GET responses before working with.
+## RxJS Cache Service
+RxJS cache response is a lightweight (22 KB zipped), zero-dependencies, client-side package,
+which is designed to enhance user experience in applications where data remains static
+during a session or changes infrequently.
 
-It significantly improves user experience in applications
-where data does not change during a session or, the change frequency is low.
+By efficiently caching responses from RxJS GET method calls, the package ensures that users don't experience
+unnecessary delays. When stale data is available, users will see it promptly, reducing wait times
+and creating a seamless browsing experience.
+
+
+### <section id="features"> Main Features </section>
+- Global accessibility throughout the application.
+- Accelerates data access.
+- Reduces network requests.
+- Uses stale data during refresh.
+- Simplifies prefetching.
+- Includes clear timeouts for precise caching control.
+- Integrated DevTool for visual cache event inspection.
+- Designed for easy use.
 
 ### Document Main Sections
 -  <a href="#features"> Main Features </a>
--  <a href="#usage"> Usage Example </a>
+-  <a href="#usage"> Usage Examples </a>
 -  <a href="#angular"> Usage in Angular </a>
 -  <a href="#structure"> Cache Structure and Auto-Generated Keys </a>
--  <a href="#uid"> When to Use Unique Identifier </a>
+-  <a href="#uid"> Determining When to Use a Unique Identifier </a>
 -  <a href="#prefetch"> Prefetching </a>
 -  <a href="#clean"> Cleaning the Data </a>
 -  <a href="#reset"> Resetting the Cache </a>
--  <a href="#refresh"> How Refreshing Works with Subscribers </a>
+-  <a href="#refresh"> How Refreshing Works with RxJS Subscribers </a>
 -  <a href="#multiple-instances"> Multiple Instances </a>
 -  <a href="#bulk"> Bulk Operations </a>
 -  <a href="#null-ignore"> Null Values in Query Params </a>
 -  <a href="#devtool"> Developer Tool </a>
--  <a href="#tables"> Available Methods & Parameters </a>
+-  <a href="#tables"> API Reference </a>
 
-### <section id="features"> Main Features </section>
--  Globally available through the whole application
--  Improving user experience by increasing the data accessibility speed
--  Reducing network requests
--  Using stale data while refreshing
--  Prefetch easily
--  Clear timeout
--  <b>Integrated devtool</b> which lets you inspect the cache event history visually
--  Ease of use
 
-### <section id="usage"> Usage Example </section>
-Instantiate the cacheService in the root of your application or in any other place in the components tree.
+### <section id="usage"> Usage Examples </section>
+Install the package:
+
+```shell
+npm install rxjs-cache-service --save
+```
+or
+```shell
+yarn add rxjs-cache-service
+```
+
+
+Instantiate the cache service at the root of your application or any other location within the components tree.
 ```ts
 const cacheService = new CacheService({
    isDevMode: process.env.MODE === "development",
    devtool: {
       show: true,
-      isOpenInitially: true,
    },
 });
 ```
-See <a href="#config-params">Configuration Available Parameters<a/>
+See <a href="#config-params">Configuration Available Parameters</a>
 
-Provide it if you need and start using the service <code>get()</code> method as follow.
+Supply it as needed and start using it as follows:
 
-<b>Please Note</b> that you can use the <code>get()</code> method in 2 ways:
+<b>Please Note</b> that you can use the `get()` method in 2 ways:
 -  Using arrangedUrl
 -  Ignoring arrangedUrl
 
-<b>arrangedUrl</b> is part of the auto-generated key that the service uses to store the data. 
-It's the combination of provided url, string query params (if exists in url param), defaultParams and params.
-Alphabetically sorted, and empty strings and undefined and null values are removed
-(removing null values can be configured).
+<b>arrangedUrl</b> is a part of the auto-generated key used by the service to store data.
+It's a combination of provided `url`, string query parameters (if they exist in url parameter),
+`defaultParams` and `params`.
+The values are alphabetically sorted, and empty strings, undefined, and null values are
+automatically removed (null value removal can be configured).
 
-For better understanding read the <a href="#structure"> Cache Structure and Auto-Generated Keys </a> section.
+For a deeper understanding, refer to the <a href="#structure"> Cache Structure and Auto-Generated Keys </a> section.
 
 Method 1 ( Using arrangedUrl ):
 ```ts
-function getPosts() {
+const getPosts = () => {
    return cacheService.get<Post[]>({
       url: "posts",
       defaultParams: {page: 1, "page-size": 20},
@@ -71,7 +86,7 @@ function getPosts() {
 
 Method 2 ( Ignoring arrangedUrl argument and working with your own data ):
 ```ts
-function getPosts() {
+const getPosts = () => {
    const url = "posts";
    const params = urlParamsObject;
    return cacheService.get<Post[]>({
@@ -82,29 +97,28 @@ function getPosts() {
    });
 }
 ```
-Read the next section to see <b>when to use which</b> ?
+Read the following section to understand <b>when to use each method</b>?
 
-<b>Important Hint:</b> Make sure you also provide the params (if exists) to the <code>get()</code> method.
-This is because the service use all the query parameters to generate unique keys.
+<b>Important Hint:</b>  Ensure that you also provide the parameters (if they exist) 
+to the get() method. This is essential as the service uses all query parameters to generate unique keys.
 
-Also, for getting the best possible result of the service, always add your default params.
-This will prevent of generating 2 different keys for <code>/posts</code> & <code>/posts?page=1</code> which we know
-that they are exactly the same.
+Additionally, to achieve the best possible results from the service, always include your
+API default parameters when they can be altered by the end-user. This prevents the generation
+of two different keys for /posts and /posts?page=1, even though they are essentially the same.
 
 Read the <a href="#structure"> Cache Structure and Auto-Generated Keys </a> section for more details.
 
-See <a href="#instance-params">Available Methods & Parameters<a/>
+See <a href="#get-params">Get Method Available Parameters</a>
 
-### <section id="methods"> When to Use Second Method </section>
-The only situation that you need to use the second method, is when you need something that
-is ignored in <code>arrangedUrl</code>.
-In <code>arrangedUrl</code>, all the empty strings, undefined and null values
-get removed (ignoring null values is configurable). Also duplicated query params get overwritten,
-and you should join them with comma if you really need them.
-If this behaviour doesn't satisfy you, consider the second method and work with your own data.
+### <section id="methods"> Determining When to Use Second Method </section>
+You may opt for the second method only when there's a specific requirement that is ignored
+in arrangedUrl. In arrangedUrl, all empty strings, undefined, and null values are automatically
+removed (ignoring null values can be configured). Additionally, duplicated query parameters
+are overwritten, and you should concatenate them with commas if you genuinely need all of them.
+If this behavior doesn't meet your needs, consider using the second method and work with your own data.
 
 ### <section id="angular"> Usage Example in Angular </section>
-Hint: Make sure you have read the <a href="#usage"> Usage Example </a> section first.
+Hint: Ensure you have read the <a href="#usage"> Usage Example </a> section first.
 ```ts
 function cacheServiceFactory() {
    return new CacheService({
@@ -122,7 +136,7 @@ function cacheServiceFactory() {
 
 And start using it in your services:
 ```ts
-function getPosts() {
+const getPosts = () => {
    return this._cacheService.get<Post[]>({
       url: "posts",
       observable: ({arrangedUrl}) => this._httpClient.get<Post[]>(arrangedUrl),
@@ -132,10 +146,10 @@ function getPosts() {
 ```
 
 ### <section id="structure"> Cache Structure and Auto-Generated Keys </section>
-The cache is a map of auto-generated keys and the reshaped data by your possible operations (not the actual api response).
-So a code snippet like this:
+The cache is a map of auto-generated keys and the data reshaped by your potential
+operations (not the actual API response). For example, a code snippet like this:
 ```ts
-function getPosts() {
+const getPosts = () => {
    return cacheService.get<Post[]>({
       url: "posts",
       defaultParams: {page: 1 },
@@ -156,9 +170,9 @@ const cache = {
    "posts? end-date=some_date & page=some_number & start-date=some_date": res_with_your_changes
 }
 ```
-And if you pass <code>uniqueIdentifier</code> param as well:
+If you also pass the uniqueIdentifier parameter:
 ```ts
-function getPosts() {
+const getPosts = () => {
    return cacheService.get<Post[]>({
       uniqueIdentifier: "tweaked_posts",
       url: "posts",
@@ -166,7 +180,7 @@ function getPosts() {
    });
 }
 ```
-The cache will ended up like this:
+The cache will end up like this:
 ```ts
 const cache = {
    "tweked_posts__posts? end-date=some_date & page=some_number & start-date=some_date": res_with_your_changes
@@ -176,44 +190,42 @@ const cache = {
 <b>Please note</b> that the query parameters are sorted, undefined value is removed and the stored data
 is the changed version.
 
-<b>In most cases</b> you don't need to pass <code>uniqueIdentifier</code>.
-Check the next section to see where you need to.
+<b>In most cases</b> you don't need to pass `uniqueIdentifier`.
+Refer to the next section to understand when it's necessary.
 
-<b><code>arrangedUrl</code></b> which will be passed as on argument to your observable, is actually this auto-generated key
+<b>`arrangedUrl`</b> passed as an argument to your observable is essentially this auto-generated key
 but <b>without</b> the unique identifier part.
 
-### <section id="uid"> When to Use Unique Identifier </section>
-As you can see in the previous section, the data stored in the cache is not always the raw version of the response.
-This mey lead to <b>conflict</b> in some rare situations 
-when you are working with the same API, but with different operations in different modules.
+### <section id="uid"> Determining When to Use a Unique Identifier </section>
+As you can see in the previous section, the data stored in the cache is not always the raw version
+of the response. This <b>will lead to conflicts</b> in some rare situations when you are working
+with the same API but with different operations in different modules.
 
-Imagine this situation that module A has called the API ("/posts") and the tweaked version
-of the response is stored in the cache.
-When module B calls the same API with different operations (because it needs a different version
-of the data), if the <b>uniqueIdentifier</b> is NOT passed either in both modules,
-the cache service generates the key and ends up with the exact same key, so it notify 
-module B subscriber with the wrong data.
 
-<b>To prevent these type of conflicts</b> you can use the <code>uniqueIdentifier</code>
+Imagine a situation where module A has called the API ("/posts"), and the tweaked version of the
+response is stored in the cache. When module B calls the same API with different operations
+(as it needs a distinct version of the data), if the `uniqueIdentifier` is NOT passed
+in both modules, the cache service generates the key, resulting in the exact same key.
+Consequently, it notifies the module B subscriber with incorrect data.
+
+<b>To prevent these types of conflicts</b> you can use the `uniqueIdentifier`
 parameter to distinguish between them.
 
 ### <section id="prefetch"> Prefetching </section>
-
-Simply subscribe to your API handler and the result will be stored in the cache for later usages.
+Simply subscribe to your API handler, and the result will be stored in the cache for later use.
 ```ts
 getPost().subscribe();
 ```
 
 ### <section id="clean"> Cleaning the Data </section>
-The <code>clean()</code> method lets you remove a specific data or a collection.
+The clean() method allows you to remove specific data or multiple entries from the cache.
 
-<b>Hint: </b> if you used <code>uniqueIdentifier</code>, make sure to include it
-in <code>clean()</code> method second parameter.
+<b>Hint: </b> if you used `uniqueIdentifier`, make sure to include it in the second parameter.
 
-<b>Hint: </b>The default behaviour for query is NOT based on exact match.
+<b>Note: </b>The default behavior for queries is NOT based on an exact match.
 
 #### Examples
-Imagine that the cache is in this state:
+Picture the cache in this state:
 ```ts
 const cache = {
     "posts?page=1" : data,
@@ -234,99 +246,103 @@ To clean one key, containing "posts" & page=1 (exact match):
 cacheService.clean('posts',{ queryParams: { page: 1}, exact: true })
 ```
 
-<b>Please note</b> that in none of above examples the forth and fifth keys do not get removed
-because <code>uniqueIdentifier</code> is not included in the options.
+<b>Please note</b> that neither of the above examples removes
+the fourth and fifth keys because uniqueIdentifier is not included in the options.
 
-To clean all the keys containing "posts" & comments=true & uid=tweaked_posts (the fifth key):
+To clean all the keys containing "posts" & comments=true & uid=tweaked_posts (matches only the fifth key):
 ```ts
 cacheService.clean('posts',{ uniqueIdentifier: "tweaked_posts", queryParams: { comments: true} })
 ```
 
-See <a href="#clean">Clean Method Available Parameters<a/>
+See <a href="#clean-params">Clean Method Available Parameters</a>
 
 ### <section id="reset"> Resetting the Cache </section>
-The <code>resetCache()</code> method will erase the entire stored data.
+The `resetCache()` method clears the entire cache.
 
 ```ts
 cacheService.resetCache();
 ```
 
-### <section id="refresh"> How Refreshing Works with Subscribers </section>
-If the data is not present in the cache, <code>subscriber.next()</code> and
-<code>subscriber.complete()</code> will be called as soon as the request is resolves.
+### <section id="refresh"> How Refreshing Works with RxJS Subscribers </section>
+If the data is not in the cache, subscriber.next() and subscriber.complete() are triggered
+when the request is resolved.
 
-If the data is present in the cache, <code>subscriber.next()</code> will be immediately called
-with the staled data, then it would be called with the fresh data once the request is resolved,
-as well as <code>subscriber.complete()</code>.
+If the data is already in the cache, subscriber.next() is immediately invoked
+with the stale data. Once the request is resolved, it's called again with the fresh data,
+and subscriber.complete() is also triggered.
 
 ### <section id="multiple-instances"> Multiple Instances </section>
-Using multiple instances of the service is supported but the devtool should be used with one instance
-at a time.
+Using multiple instances of the service is supported, but the devtool
+should be used with one instance at a time.
 
 ### <section id="bulk"> Bulk Operations </section>
-Bulk operations like <code>forkJoin</code> are not supported in this version.
+Bulk operations, such as forkJoin, are not supported in this version.
 
 ### <section id="null-ignore"> Null Values in Query Params </section>
-Null values being ignored from query parameters by default. This behaviour can be changed in
-cache configuration at instantiation.
+Null values are ignored from query parameters by default. This behavior can be changed
+in the cache configuration at instantiation.
 
-See <a href="#config-params">Configuration Available Parameters<a/>
+See <a href="#config-params">Configuration Available Parameters</a>
 
 ### <section id="devtool"> Developer Tool </section>
-The integrated developer tool lets you inspect the cache last state and history of changes.
-Also, every event related to the cache, will be logged into.
+The integrated developer tool allows you to inspect the last state
+of the cache and its history of changes. Additionally, every event
+related to the cache will be logged in the tool.
 
-See <a href="#devtool-params">Devtool Available  Parameters<a/>
+See <a href="#devtool-params">Devtool Available  Parameters</a>
 
-### <section id="tables"> Available Methods & Parameters </section>
+### <section id="tables"> API Reference </section>
 
 #### <section id="config-params"> Configuration Parameters </section>
 
-| Name                              | Type            | Description                                                                                                                                                                                                                                                                                                                |
-|:----------------------------------|:----------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| isDevMode                         | boolean         | In dev mode, clear timeouts will be stored in local storage to be cleared in possible hot-reloads.This will make sure that the devtool will not show wrong information from previous loads in developer mode. Also, devtool is available only in dev mode.                                                                 |
-| paramsObjectOverwrites-<br/>UrlQueries | boolean [=true] | Indicates how the service should behave if a query parameter is accidentally present in both <code>url</code> parameter as well as in <code>params</code> parameter.<br/>Example: cacheService.get({url: "/posts?page=2", params: {page: 3}}}, observable:() => observable) by default will be resolved to "/post?page=3". |
-| removeNullValues                  | boolean [=true] | Indicates whether null values should be removed from query params.                                                                                                                                                                                                                                                         |
-| devtool                           | object [:?]     | Developer tool configuration. See <a href="#devtool-params">Devtool Available  Parameters<a/>.                                                                                                                                                                                                                             |
+| Name                              | Type            | Description                                                                                                                                                                                                                                                                                               |
+|:----------------------------------|:----------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| isDevMode                         | boolean         | In dev mode, clear timeout IDs will be stored in local storage to be cleared in possible hot-reloads. This ensures that the devtool does not display incorrect information from previous loads during development.<br/><b>Additionally</b>, the devtool is available only in dev mode.                    |
+| paramsObjectOverwrites-<br/>UrlQueries | boolean [=true] | Determines how the service should behave if a query parameter is accidentally present in both the url parameter and the params parameter.<br/><b>Example</b>: `cacheService.get({url: "/posts?page=2", params: {page: 3}, observable:() => observable})` by default will be resolved to `"/post?page=3"`. |
+| removeNullValues                  | boolean [=true] | Determines whether null values should be removed from query parameters or not.                                                                                                                                                                                                                            |
+| devtool                           | object [:?]     | Developer tool configuration. See <a href="#devtool-params">Devtool Available  Parameters</a>.                                                                                                                                                                                                            |
+
 <br></br>
 
-#### <section id="instance-params"> Service Instance Methods & Parameters </section>
+#### <section id="instance-params"> Service Instance Methods & Properties </section>
 
-| Name    | Type     | Description                                                    |
-|:--------|:---------|:---------------------------------------------------------------|
-| get()   | function | To fetching data and storing the expected result in the cache. |
-| clean() | function | To clean or a collection data.                                 |
-| reset() | function | To reset the entire cache.                                     |
-| config   | object   | Configuration passed to the service.                           |
-| cachedData   | object   | The stored data.                                               |
-| observables | object   | The stored observable.                                         |
-| clearTimeouts | object   | The active clear timeouts.                                     |
+| Name    | Type     | Description                                                            |
+|:--------|:---------|:-----------------------------------------------------------------------|
+| get()   | function | Fetches data and stores the expected result in the cache.              |
+| clean() | function | Allows you to remove specific data or multiple entries from the cache. |
+| reset() | function | Clears the entire cache.                                            |
+| config   | object   | Configuration passed to the service.                                   |
+| cachedData   | object   | Stored data.                                                           |
+| observables | object   | Stored observables.                                                    |
+| clearTimeouts | object   | Active clear timeouts.                                                 |
+
 <br></br>
 
 #### <section id="get-params"> Get Method Parameters </section>
 
-| Name             | Type             | Description                                                                                                               |
-|:-----------------|:-----------------|:--------------------------------------------------------------------------------------------------------------------------|
-| url              | string           | The api address (may include query params or not)                                                                         |
-| observable       | () => function   | The callback function which returns an observable.<br/> It receives an object containing the  arrangedUrl as input.       |
-| uniqueIdentifier | string [:?]      | Will be added to the auto-generated key for storing the data.<br/>See <a href="#uid"> When to Use Unique Identifier </a>. |
-| defaultParams    | object [:?]      | Default query params (add to get the best result).                                                                        |
-| params           | object [:?]      | Query parameters.                                                                                                         |
-| refresh          | boolean [=false] | Indicated if the data should be refreshed on next calls or not.                                                           |
-| clearTimeout     | number [?:]      | The time in milliseconds which be used to remove the data from the cache.                                                 |
+| Name             | Type             | Description                                                                                                                                                                                            |
+|:-----------------|:-----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| url              | string           | The endpoint address (may include query parameters or not).                                                                                                                                            |
+| observable       | () => function   | The callback function that returns an observable. It receives an object containing the `arrangedUrl` as input.<br/>See <a href="#structure"> Cache Structure and Auto-Generated Keys </a> for details. |
+| uniqueIdentifier | string [:?]      | This value, if present, will be added to the auto-generated key for storing the data.<br/>See <a href="#uid"> When to Use Unique Identifier </a>.                                                      |
+| defaultParams    | object [:?]      | The API's default query parameters.<br/>To optimize cache results, ensure to include them if they can be altered by the end-user.                                                                      |
+| params           | object [:?]      | The queryParams will overwrite the defaultParams, and by default (configurable), any query strings in the url parameter will also be overwritten.                                                 |
+| refresh          | boolean [=false] | Determines if the data should be refreshed on the next calls or not.<br/>By default, the API will be called only once.                                                                                 |
+| clearTimeout     | number [?:]      | The time in milliseconds used to remove the data from the cache.                                                                                                                                       |
+
 <br></br>
 
 #### <section id="clean-params"> Clean Method Parameters </section>
 
-| Name                     | Type         | Description                                                                                                                       |
-|:-------------------------|:-------------|:----------------------------------------------------------------------------------------------------------------------------------|
-| url                      | string       | May or may not include query strings.<br/>Do NOT include <code>uniqueIdentifier</code> part here.                                 |
-| options                  | object [?:]  | Extra options for cleaning.                                                                                                       |
-| options.uniqueIdentifier | string [?:]  | Unique identifier (if the key includes unique identifier, you should pass it here if even the query is not based on exact match). |
-| options.exact            | boolean [?:] | Indicates if the query should be based on exact match.                                                                            |
-| options.queryParams      | object [?:]  | Query Parameters (will be sorted and truncated if contains empty string and undefined).                                           |
+| Name                     | Type         | Description                                                                                                                                        |
+|:-------------------------|:-------------|:---------------------------------------------------------------------------------------------------------------------------------------------------|
+| url                      | string       | The endpoint address (may include query parameters or not).<br/><b>DO NOT</b> include the `uniqueIdentifier` part here.                            |
+| options                  | object [?:]  | Extra options for cleaning.                                                                                                                        |
+| options.exact            | boolean [?:] | Determines if the query should be based on an exact match or not.                                                                                  |
+| options.uniqueIdentifier | string [?:]  | Unique identifier.<br/><b>Note</b>: If the key includes a unique identifier, you should pass it here, even if the query is not based on an exact match. |
+| options.queryParams      | object [?:]  | Query Parameters. They will be sorted and truncated if they contain an empty string, undefined, or null (null is configurable).                             |
 
-See <a href="clean"> Cleaning the data </a> for examples.
+See <a href="#clean"> Cleaning the data </a> for examples.
 <br></br>
 
 
