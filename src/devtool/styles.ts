@@ -6,7 +6,7 @@ type StylesConfig = DevtoolConfig["styles"];
 
 const defaultStyles = defaults.devtool.styles;
 const primaryColor = "#d97b5d";
-const secondaryColor = "#155263";
+const secondaryColor = "#0b4859";
 
 const buttonDefaultStyles: CSSStyles = {
    boxSizing: "border-box",
