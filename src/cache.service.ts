@@ -13,7 +13,7 @@ import {mapToObject} from "./utils/map-to-object";
 import {uidSeparator} from "./constants/uid-separator";
 
 /**
- * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service}
+ * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#beginning}}
  *
  * @usageNote Multiple instances is supported, but the devtool SHOULD be used with one instance at a time
  *

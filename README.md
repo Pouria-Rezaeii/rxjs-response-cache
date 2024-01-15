@@ -1,11 +1,11 @@
-## RxJS Cache Service
+## <section id="beginning"> RxJS Cache Service </section>
 RxJS cache response is a lightweight (22 KB zipped), zero-dependencies, client-side package,
-which is designed to enhance user experience in applications where data remains static
-during a session or changes infrequently.
+designed to improve user experience in applications where data remains static
+or changes infrequently during user browsing.
 
-By efficiently caching responses from RxJS GET method calls, the package ensures that users don't experience
-unnecessary delays. When stale data is available, users will see it promptly, reducing wait times
-and creating a seamless browsing experience.
+By efficiently caching responses from RxJS GET method calls, the package ensures users won't hit
+unnecessary delays. When stale data is available, users will see it promptly, cutting down
+wait times and creating a seamless browsing experience.
 
 
 ### <section id="features"> Main Features </section>
