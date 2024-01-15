@@ -1,5 +1,5 @@
 ## <section id="beginning"> RxJS Cache Service </section>
-RxJS cache response is a lightweight (22 KB zipped), zero-dependencies, client-side package,
+RxJS cache response is a lightweight (27 KB zipped), zero-dependencies, client-side package,
 designed to improve user experience in applications where data remains static
 or changes infrequently during user browsing.
 

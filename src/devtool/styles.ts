@@ -21,23 +21,13 @@ const buttonDefaultStyles: CSSStyles = {
    border: "1px solid #00000088",
 };
 
-export const flexBox: CSSStyles = {
-   display: "flex",
-};
-
 export const toggleButton = (stylesConfig: StylesConfig): CSSStyles => ({
    ...buttonDefaultStyles,
+   padding: "8px",
    position: "fixed",
    right: `${stylesConfig?.toggleButtonPosition?.right || defaultStyles.right}px`,
    bottom: `${stylesConfig?.toggleButtonPosition?.bottom || defaultStyles.bottom}px`,
    zIndex: (stylesConfig?.zIndex || defaultStyles.zIndex).toString(),
-   flexDirection: "column",
-   gap: "4px",
-   fontSize: "12px",
-   padding: "8px",
-   width: "58px",
-   lineHeight: "1.6",
-   textAlign: "center",
    userSelect: "none",
    backgroundColor: secondaryColor,
    color: primaryColor,
@@ -67,6 +57,7 @@ export const titleBox: CSSStyles = {
    alignItems: "center",
    paddingRight: "10px",
    marginBottom: "24px",
+   fontWeight: "500",
 };
 
 export const title: CSSStyles = {
@@ -195,7 +186,7 @@ export function addDefaultStyles() {
    document.head.insertAdjacentHTML(
       "beforeend",
       `<style>
-         @import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+         @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap');
          #devtool-container * {
             margin: 0;
             padding: 0;

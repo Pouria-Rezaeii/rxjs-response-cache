@@ -3,6 +3,7 @@ import * as styles from "./styles";
 import {ids} from "./ids";
 import {DevtoolConfig, DevtoolHistoryListItem, DevtoolListItem} from "./type";
 import {defaults} from "../defaults";
+import {iconBase64} from "../constants/icon";
 
 let history: DevtoolHistoryListItem[] = [];
 let devtoolIsOpen = defaults.devtool.isOpenInitially;
@@ -47,10 +48,11 @@ function attachToggleButton() {
    }
 
    const toggleButton = createElement({
-      innerHtml: "Cache Devtool",
+      innerHtml: `<img src=${iconBase64} alt="rxjs-cache-service" style="width: 24px;height: 24px"/>`,
       id: ids.toggleButton,
       class: "devtool-button",
       styles: styles.toggleButton(config?.styles),
+      title: "Toggle Devtool",
       onClick: () => {
          const container = document.getElementById(ids.container);
          container!.style.left = `${
@@ -90,11 +92,20 @@ function generateTitleBox() {
       styles: styles.titleBox,
    });
 
+   const flexBox = createElement({
+      styles: {display: "flex", gap: "4px", alignItems: "center"},
+   });
+
+   const icon = `<img src=${iconBase64} alt="rxjs-cache-service" />`;
+
    const title = createElement({
       tagName: "p",
       innerHtml: "Cache Devtool",
       styles: styles.title,
    });
+
+   flexBox.innerHTML = icon;
+   flexBox.appendChild(title);
 
    const closeButton = createElement({
       innerHtml: "✕",
@@ -104,7 +115,7 @@ function generateTitleBox() {
       onClick: () => document.getElementById(ids.toggleButton)?.click(),
    });
 
-   titleBox.appendChild(title);
+   titleBox.appendChild(flexBox);
    titleBox.appendChild(closeButton);
 
    return titleBox;
@@ -239,7 +250,7 @@ function createListItem(number: number, params: DevtoolHistoryListItem) {
       {key: "Status:", value: status},
    ].forEach((item) => {
       const row = createElement({
-         styles: styles.flexBox,
+         styles: {display: "flex"},
          innerHtml: `
       <p style="width:48px; flex-shrink:0;">${item.key}</p>
       <p
