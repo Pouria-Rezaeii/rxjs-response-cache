@@ -1,11 +1,11 @@
-import {ObservableConfig} from "../types/cache.type";
+import {QueryParams} from "../types/cache.type";
 import {defaults} from "../defaults";
 
 /* sorts params alphabetically and removes possible extra params */
 export function rearrangeUrl(inputs: {
    url: string;
-   defaultParams?: ObservableConfig<unknown>["defaultParams"];
-   params?: ObservableConfig<unknown>["params"];
+   defaultParams?: QueryParams;
+   params?: QueryParams;
    paramsObjectOverwrites?: boolean;
    removeNullValues?: boolean;
 }) {
@@ -17,7 +17,7 @@ export function rearrangeUrl(inputs: {
       removeNullValues = defaults.removeNullValues,
    } = inputs;
 
-   const removable = ["", "''", '""', "undefined"];
+   const removable = ["", "''", '""', "undefined", "NaN"];
    if (removeNullValues) {
       removable.push("null");
    }
@@ -52,12 +52,25 @@ export function rearrangeUrl(inputs: {
            ...urlParamObject,
         };
 
-   const formattedQueryParams = Object.keys(finalParams)
+   const stingQueryParams = Object.keys(finalParams).reduce<QueryParams>((acc, key: string) => {
+      const value = finalParams[key];
+      // converting 3 falsy value to save them from being removed in next filter operation
+      if (value === null || value === false || value === 0) {
+         acc![key] = String(value);
+      } else {
+         acc![key] = value;
+      }
+      return acc;
+   }, {});
+
+   const formattedQueryParams = Object.keys(stingQueryParams)
       // removing redundant values
-      .filter((key) => finalParams[key] && !removable.includes(finalParams[key].toString()))
+      .filter(
+         (key) => !!stingQueryParams[key] && !removable.includes(stingQueryParams[key].toString())
+      )
       .sort((a, b) => a.localeCompare(b))
       // joining key value pairs
-      .map((key) => key + "=" + finalParams[key].toString())
+      .map((key) => key + "=" + stingQueryParams[key])
       .join("&");
 
    const formattedUrl = apiAddress + "?" + formattedQueryParams;

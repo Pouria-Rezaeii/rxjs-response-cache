@@ -42,12 +42,14 @@ export type ObservableConfig<T> = {
    observable: (params: {arrangedUrl: string}) => GenericObservable<T>;
    refresh?: boolean;
    clearTimeout?: number;
-   params?: Record<string, string | number | boolean>;
-   defaultParams?: Record<string, string | number | boolean>;
+   params?: QueryParams;
+   defaultParams?: QueryParams;
 };
 
 export type CleanQueryOptions = {
    uniqueIdentifier?: string;
    exact?: boolean;
-   queryParams?: Record<string, string | number | boolean>;
+   queryParams?: QueryParams;
 };
+
+export type QueryParams = Record<string, string | number | boolean>;

@@ -1,12 +1,13 @@
 ## <section id="beginning"> RxJS Cache Service </section>
-RxJS cache response is a lightweight (27 KB zipped), zero-dependencies, client-side package,
+RxJS cache response is a lightweight, zero-dependencies, client-side package,
 designed to improve user experience in applications where data remains static
 or changes infrequently during user browsing.
 
-By efficiently caching responses from RxJS GET method calls, the package ensures users won't hit
+By caching responses from RxJS GET method calls, this package ensures users won't hit
 unnecessary delays. When stale data is available, users will see it promptly, cutting down
 wait times and creating a seamless browsing experience.
 
+#### Check the <a href="https://rxjs-cache-service-live-demo.vercel.app/"><u>Live Demo</u></a>
 
 ### <section id="features"> Main Features </section>
 - Global accessibility throughout the application.
