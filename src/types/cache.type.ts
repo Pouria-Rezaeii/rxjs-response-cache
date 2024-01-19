@@ -52,4 +52,4 @@ export type CleanQueryOptions = {
    queryParams?: QueryParams;
 };
 
-export type QueryParams = Record<string, string | number | boolean>;
+export type QueryParams = Record<string, string | number | boolean | undefined | null>;

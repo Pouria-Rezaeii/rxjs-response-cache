@@ -108,10 +108,10 @@ describe("Cache service rearranging url parameters", () => {
             defaultParams: {
                e: "undefined",
                f: "null",
-               v: NaN as unknown as string,
+               v: NaN,
                z: [] as unknown as string,
             },
-            params: {g: undefined as unknown as string, h: "", i: null as unknown as string},
+            params: {g: undefined, h: "", i: null},
          })
       );
 
@@ -131,7 +131,7 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl.concat("?a=T&b=null"),
-            params: {c: null as unknown as string},
+            params: {c: null},
             observable: ({arrangedUrl}) => {
                expect(arrangedUrl).toEqual(expectedUrl);
                return observableFunction(arrangedUrl);
@@ -144,7 +144,7 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Does not remove important falsy values (null, 0, false)`.", async () => {
+   it("Does not remove important falsy values (null, 0, false).", async () => {
       cacheService = new CacheService({
          isDevMode: false,
          removeNullValues: false,
@@ -155,7 +155,32 @@ describe("Cache service rearranging url parameters", () => {
       await lastValueFrom(
          cacheService.get({
             url: postsUrl,
-            params: {a: null as unknown as string, b: 0, c: false},
+            params: {a: null, b: 0, c: false},
+            observable: ({arrangedUrl}) => {
+               expect(arrangedUrl).toEqual(expectedUrl);
+               return observableFunction(arrangedUrl);
+            },
+         })
+      );
+
+      expect(cacheService.cachedData).toEqual({
+         [expectedUrl]: posts,
+      });
+   });
+
+   it("Does not overwrite query params if value is falsy", async () => {
+      cacheService = new CacheService({
+         isDevMode: false,
+         removeNullValues: false,
+      });
+
+      const expectedUrl = postsUrl.concat("?a=T&b=T&c=T");
+
+      await lastValueFrom(
+         cacheService.get({
+            url: postsUrl.concat("?a=null&&b=T"),
+            defaultParams: {a: "T"},
+            params: {b: null, c: "T"},
             observable: ({arrangedUrl}) => {
                expect(arrangedUrl).toEqual(expectedUrl);
                return observableFunction(arrangedUrl);
