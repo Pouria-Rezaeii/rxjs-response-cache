@@ -20,7 +20,8 @@
    "keywords": [
       "rxjs",
       "cache",
-      "observable"
+      "observable",
+      "angular"
    ],
    "scripts": {
       "prepare": "husky install",

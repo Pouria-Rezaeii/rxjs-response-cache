@@ -61,7 +61,7 @@ See <a href="#config-params">Configuration Available Parameters</a>
 
 Supply it as needed and start using it as follows:
 
-<b>Please Note</b> that you can use the `get()` method in 2 ways:
+<b>Please Note</b> that you can use the `get()` method (which returns a new observable) in 2 ways:
 -  Using arrangedUrl
 -  Ignoring arrangedUrl
 
@@ -80,7 +80,7 @@ const getPosts = () => {
       url: "posts",
       defaultParams: {page: 1, "page-size": 20},
       params: urlParamsObject,
-      observable: ({arrangedUrl}) => rxjs_observable<Post[]>(arrangedUrl).pipe(your_operations),
+      observable: ({arrangedUrl}) => observable<Post[]>(arrangedUrl).pipe(your_operations),
    });
 }
 ```
@@ -94,7 +94,7 @@ const getPosts = () => {
       url: url,
       defaultParams: {page: 1, "page-size": 20},
       params: params,
-      observable: () => rxjs_observable<Post[]>(url, {params}).pipe(your_operations),
+      observable: () => observable<Post[]>(url, {params}).pipe(your_operations),
    });
 }
 ```
@@ -110,6 +110,11 @@ of two different keys for /posts and /posts?page=1, even though they are essenti
 Read the <a href="#structure"> Cache Structure and Auto-Generated Keys </a> section for more details.
 
 See <a href="#get-params">Get Method Available Parameters</a>
+
+And then:
+```ts
+getPost().subscribe();
+```
 
 ### <section id="methods"> Determining When to Use Second Method </section>
 You may opt for the second method only when there's a specific requirement that is ignored
@@ -137,7 +142,7 @@ function cacheServiceFactory() {
 
 And start using it in your services:
 ```ts
-const getPosts = () => {
+getPosts = () => {
    return this._cacheService.get<Post[]>({
       url: "posts",
       observable: ({arrangedUrl}) => this._httpClient.get<Post[]>(arrangedUrl),
@@ -145,6 +150,12 @@ const getPosts = () => {
    });
 }
 ```
+
+And then in your components:
+```ts
+getPost().subscribe();
+```
+
 
 ### <section id="structure"> Cache Structure and Auto-Generated Keys </section>
 The cache is a map of auto-generated keys and the data reshaped by your potential
@@ -160,7 +171,7 @@ const getPosts = () => {
          "end-date": some_date,
          "some-other-param": is_undefined_for_now 
       },
-      observable: ({arrangedUrl}) => rxjs_observable<Post[]>(arrangedUrl)
+      observable: ({arrangedUrl}) => observable<Post[]>(arrangedUrl)
          .pipe(map((res) => res_with_some_changes )),
    });
 }
@@ -272,8 +283,11 @@ If the data is already present in the cache, `subscriber.next()` is immediately 
 By default, once the request is resolved, the newly fetched data is compared to the stale data. If they differ,
 `subscriber.next()` is invoked again with the fresh data, and ultimately, `subscriber.complete()` is triggered.
 
-TThis equality check can be disabled in the configuration, causing `subscriber.next()` to be called twice,
+This equality check can be disabled in the configuration, causing `subscriber.next()` to be called twice,
 even if the data is identical to the cached version.
+
+<b>Please note</b> that you should stop rendering spinners and skeletons into the `next()` function not the `complete()`,
+when using the refresh feature.
 
 ### <section id="multiple-instances"> Multiple Instances </section>
 Using multiple instances of the service is supported, but the devtool
