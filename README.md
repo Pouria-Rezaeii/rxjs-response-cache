@@ -4,7 +4,7 @@ designed to improve user experience in applications where data remains static
 or changes infrequently during user browsing.
 
 By caching responses from RxJS GET method calls, this package ensures users won't hit
-unnecessary delays. When stale data is available, users will see it promptly, cutting down
+unnecessary delays. When stale data is available, users will see it immediately, cutting down
 wait times and creating a seamless browsing experience.
 
 #### Check the <a href="https://rxjs-cache-service-live-demo.vercel.app/"><u>Live Demo</u></a>
@@ -321,15 +321,15 @@ See <a href="#devtool-params">Devtool Available  Parameters</a>
 
 #### <section id="get-params"> Get Method Parameters </section>
 
-| Name             | Type             | Description                                                                                                                                                                                            |
-|:-----------------|:-----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| url              | string           | The endpoint address (may include query parameters or not).                                                                                                                                            |
-| observable       | () => function   | The callback function that returns an observable. It receives an object containing the `arrangedUrl` as input.<br/>See <a href="#structure"> Cache Structure and Auto-Generated Keys </a> for details. |
-| uniqueIdentifier | string [:?]      | This value, if present, will be added to the auto-generated key for storing the data.<br/>See <a href="#uid"> When to Use Unique Identifier </a>.                                                      |
-| defaultParams    | object [:?]      | The API's default query parameters.<br/>To optimize cache results, ensure to include them if they can be altered by the end-user.                                                                      |
-| params           | object [:?]      | The queryParams will overwrite the defaultParams, and by default (configurable), any query strings in the url parameter will also be overwritten.                                                 |
-| refresh          | boolean [=false] | Determines if the data should be refreshed on the next calls or not.<br/>By default, the API will be called only once.                                                                                 |
-| clearTimeout     | number [?:]      | The time in milliseconds used to remove the data from the cache.                                                                                                                                       |
+| Name             | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                        |
+|:-----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| url              | string           | The endpoint address (may include query parameters or not).                                                                                                                                                                                                                                                                                                                                        |
+| observable       | () => function   | The callback function that returns an observable. It receives an object containing the `arrangedUrl` as input.<br/>See <a href="#structure"> Cache Structure and Auto-Generated Keys </a> for details.                                                                                                                                                                                             |
+| uniqueIdentifier | string [:?]      | This value, if present, will be added to the auto-generated key for storing the data.<br/>See <a href="#uid"> When to Use Unique Identifier </a>.                                                                                                                                                                                                                                                  |
+| defaultParams    | object [:?]      | The API's default query parameters.<br/>To optimize cache results, ensure to include them if they can be altered by the end-user.                                                                                                                                                                                                                                                                  |
+| params           | object [:?]      | The queryParams will overwrite the defaultParams, and by default (configurable), any query strings in the url parameter will also be overwritten.                                                                                                                                                                                                                                                  |
+| refresh          | boolean [=false] | Determines if the data should be refreshed on the next calls or noDetermines if the data should refresh on subsequent calls.<br/>By default, the API will be called only <b>once</b>.<br/>Passing `true` is especially useful when you are unsure if the data will remain the same. This way, users receive the old data immediately and then see the newly fetched data if there are any changes. |
+| clearTimeout     | number [?:]      | The time in milliseconds used to remove the data from the cache.                                                                                                                                                                                                                                                                                                                                   |
 
 <br></br>
 

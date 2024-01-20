@@ -50,7 +50,14 @@ export class CacheService {
     * @param devtool --- Developer tool configuration. See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#devtool-params">Devtool Available  Parameters</a>.
     */
    constructor(config: CacheConfigType) {
-      this._config = config;
+      this._config = {
+         ...config,
+         removeNullValues: config.removeNullValues ?? defaults.removeNullValues,
+         paramsObjectOverwritesUrlQueries:
+            config.paramsObjectOverwritesUrlQueries ?? defaults.paramsObjectOverwrites,
+         preventSecondCallIfDataIsUnchanged:
+            config.preventSecondCallIfDataIsUnchanged ?? defaults.preventSecondCall,
+      };
       this._isDev = config.isDevMode;
       this._showDevtool =
          config.isDevMode &&
@@ -102,8 +109,8 @@ export class CacheService {
          url: _rawUrl,
          defaultParams: config.defaultParams,
          params: config.params,
-         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
-         removeNullValues: this._config.removeNullValues,
+         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
+         removeNullValues: this._config.removeNullValues!,
       });
       const key = uid ? uid + uidSeparator + url : url;
       this._observables.set(key, config.observable);
@@ -143,8 +150,15 @@ export class CacheService {
       this._observables.get(key)!({arrangedUrl: url}).subscribe({
          error: (err) => subscriber.error(err),
          next: (res) => {
-            this._cachedData.set(key, res);
-            subscriber.next(res);
+            if (this._config.preventSecondCallIfDataIsUnchanged) {
+               if (JSON.stringify(this._cachedData.get(key)) !== JSON.stringify(res)) {
+                  this._cachedData.set(key, res);
+                  subscriber.next(res);
+               }
+            } else {
+               this._cachedData.set(key, res);
+               subscriber.next(res);
+            }
             subscriber.complete();
             let messageText = "🔁 Refreshed";
             if (clearTimeout) {
@@ -227,8 +241,8 @@ export class CacheService {
          uniqueIdentifier: options?.uniqueIdentifier,
          url,
          options: options,
-         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries,
-         removeNullValues: this._config.removeNullValues,
+         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
+         removeNullValues: this._config.removeNullValues!,
       });
       matches.forEach((url, index) => {
          this._cachedData.delete(url);

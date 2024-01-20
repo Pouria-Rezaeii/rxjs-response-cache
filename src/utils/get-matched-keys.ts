@@ -8,8 +8,8 @@ export function getMatchedKeys(params: {
    uniqueIdentifier?: string;
    url: string;
    options?: CleanQueryOptions;
-   paramsObjectOverwrites?: boolean;
-   removeNullValues?: boolean;
+   paramsObjectOverwrites: boolean;
+   removeNullValues: boolean;
 }) {
    const {
       source,

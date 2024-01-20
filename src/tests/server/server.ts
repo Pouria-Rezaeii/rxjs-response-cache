@@ -11,14 +11,14 @@ export function mockServer(url: string, throwError?: boolean) {
             observer.error(internalServerErrorException);
             // posts
          } else if (url === "/posts" || url.startsWith("/posts?")) {
-            observer.next(posts);
+            observer.next([...posts]);
             observer.complete();
             // posts/:id
          } else if (url.startsWith("/posts/")) {
             const id = url.split("/")[2];
             const post = posts.find((p) => p.id.toString() === id);
             if (post) {
-               observer.next(post);
+               observer.next({...post});
                observer.complete();
             } else {
                observer.error(notFoundException);

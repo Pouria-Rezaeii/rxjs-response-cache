@@ -5,19 +5,13 @@ type RearrangeUrlInput = {
    url: string;
    defaultParams?: QueryParams;
    params?: QueryParams;
-   paramsObjectOverwrites?: boolean;
-   removeNullValues?: boolean;
+   paramsObjectOverwrites: boolean;
+   removeNullValues: boolean;
 };
 
 /* sorts params alphabetically and removes possible extra params */
 export function rearrangeUrl(input: RearrangeUrlInput) {
-   const {
-      url,
-      defaultParams = {},
-      params = {},
-      removeNullValues = defaults.removeNullValues,
-      paramsObjectOverwrites = defaults.paramsObjectOverwrites,
-   } = input;
+   const {url, defaultParams = {}, params = {}, removeNullValues, paramsObjectOverwrites} = input;
 
    const apiAddress = url.split("?")[0];
    const urlParams = url.split("?")[1] || "";

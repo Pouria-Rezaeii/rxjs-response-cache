@@ -6,6 +6,7 @@ describe("Cache service initialization", () => {
    const config: CacheConfigType = {
       isDevMode: false,
       paramsObjectOverwritesUrlQueries: false,
+      preventSecondCallIfDataIsUnchanged: false,
       removeNullValues: false,
       devtool: {
          show: false,
