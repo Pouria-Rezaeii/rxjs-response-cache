@@ -47,6 +47,8 @@ export class CacheService {
     *
     * @param removeNullValues --- [ default=true ] Determines whether null values should be removed from query parameters or not.
     *
+    * @param preventSecondCallIfDataIsUnchanged --- [ default=true ] Determines whether the `observable.next()` should be invoked again when the refreshed data is identical to the stale data.<br/><br/>By default, the observable.next() is invoked only once in such cases, optimizing to prevent unnecessary rerenders in applications.<br/><br/>If desired, you can pass `false` and perform your own check within your application.
+    *
     * @param devtool --- Developer tool configuration. See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#devtool-params">Devtool Available  Parameters</a>.
     */
    constructor(config: CacheConfigType) {
@@ -65,7 +67,7 @@ export class CacheService {
       this._showDevtool &&
          attachDevtool({
             devtoolConfig: config.devtool,
-            onClickCacheStateButton: () => console.log(this._cachedData),
+            onClickCacheStateButton: () => console.log(mapToObject(this._cachedData)),
          });
       // removing all possible saved timeouts ids from the last render (probably lost because of hot reload)
       this._isDev && clearAllTimeoutsInLocalStorage();

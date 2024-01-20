@@ -1,5 +1,4 @@
 import {QueryParams} from "../types/cache.type";
-import {defaults} from "../defaults";
 
 type RearrangeUrlInput = {
    url: string;

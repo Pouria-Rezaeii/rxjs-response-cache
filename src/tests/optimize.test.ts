@@ -1,10 +1,9 @@
 import {CacheService} from "../cache.service";
-import {lastValueFrom, firstValueFrom} from "rxjs";
-import {posts} from "./server/posts";
+import {lastValueFrom} from "rxjs";
 import {observableFunction} from "./utils/observable-function";
 import {resetCounterUrl, postsUrl} from "./server/urls";
 
-describe("Cache service rearranging url parameters", () => {
+describe("Subscriber.next() trigger behaviour", () => {
    let cacheService: CacheService;
 
    beforeEach(async () => {
@@ -14,7 +13,7 @@ describe("Cache service rearranging url parameters", () => {
       });
    });
 
-   it("Does not call the second .next() if data is equal (by default).", async () => {
+   it("Does not call the second .next() if data is equal to the cached version (by default).", async () => {
       const res = await lastValueFrom(
          cacheService.get({
             url: postsUrl,
@@ -34,7 +33,7 @@ describe("Cache service rearranging url parameters", () => {
       expect(res).toBe(res2);
    });
 
-   it("Does not call the second .next() if data is equal (by default).", async () => {
+   it("Calls the second .next() if data is equal to the cached version if `preventSecondCall=false`.", async () => {
       cacheService = new CacheService({
          isDevMode: false,
          preventSecondCallIfDataIsUnchanged: false,

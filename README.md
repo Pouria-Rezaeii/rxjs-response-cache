@@ -7,7 +7,7 @@ By caching responses from RxJS GET method calls, this package ensures users won'
 unnecessary delays. When stale data is available, users will see it immediately, cutting down
 wait times and creating a seamless browsing experience.
 
-#### Check the <a href="https://rxjs-cache-service-live-demo.vercel.app/"><u>Live Demo</u></a>
+#### Check the <a href="https://rxjs-cache-service-live-demo.vercel.app/" target="_blank">Live Demo</a>
 
 ### <section id="features"> Main Features </section>
 - Global accessibility throughout the application.
@@ -265,12 +265,15 @@ cacheService.resetCache();
 ```
 
 ### <section id="refresh"> How Refreshing Works with RxJS Subscribers </section>
-If the data is not in the cache, subscriber.next() and subscriber.complete() are triggered
+If the data is not present in the cache, `subscriber.next()` and `subscriber.complete()` are triggered
 when the request is resolved.
 
-If the data is already in the cache, subscriber.next() is immediately invoked
-with the stale data. Once the request is resolved, it's called again with the fresh data,
-and subscriber.complete() is also triggered.
+If the data is already present in the cache, `subscriber.next()` is immediately triggered with the stale data.
+By default, once the request is resolved, the newly fetched data is compared to the stale data. If they differ,
+`subscriber.next()` is invoked again with the fresh data, and ultimately, `subscriber.complete()` is triggered.
+
+TThis equality check can be disabled in the configuration, causing `subscriber.next()` to be called twice,
+even if the data is identical to the cached version.
 
 ### <section id="multiple-instances"> Multiple Instances </section>
 Using multiple instances of the service is supported, but the devtool
@@ -296,12 +299,13 @@ See <a href="#devtool-params">Devtool Available  Parameters</a>
 
 #### <section id="config-params"> Configuration Parameters </section>
 
-| Name                              | Type            | Description                                                                                                                                                                                                                                                                                               |
-|:----------------------------------|:----------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| isDevMode                         | boolean         | In dev mode, clear timeout IDs will be stored in local storage to be cleared in possible hot-reloads. This ensures that the devtool does not display incorrect information from previous loads during development.<br/><b>Additionally</b>, the devtool is available only in dev mode.                    |
-| paramsObjectOverwrites-<br/>UrlQueries | boolean [=true] | Determines how the service should behave if a query parameter is accidentally present in both the url parameter and the params parameter.<br/><b>Example</b>: `cacheService.get({url: "/posts?page=2", params: {page: 3}, observable:() => observable})` by default will be resolved to `"/post?page=3"`. |
-| removeNullValues                  | boolean [=true] | Determines whether null values should be removed from query parameters or not.                                                                                                                                                                                                                            |
-| devtool                           | object [:?]     | Developer tool configuration. See <a href="#devtool-params">Devtool Available  Parameters</a>.                                                                                                                                                                                                            |
+| Name                              | Type            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|:----------------------------------|:----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| isDevMode                         | boolean         | In dev mode, clear timeout IDs will be stored in local storage to be cleared in possible hot-reloads. This ensures that the devtool does not display incorrect information from previous loads during development.<br/><b>Additionally</b>, the devtool is available only in dev mode.                                                                                                                                                                                                           |
+| paramsObjectOverwrites-<br/>UrlQueries | boolean [=true] | Determines how the service should behave if a query parameter is accidentally present in both the url parameter and the params parameter.<br/><b>Example</b>: `cacheService.get({url: "/posts?page=2", params: {page: 3}, observable:() => observable})` by default will be resolved to `"/post?page=3"`.                                                                                                                                                                                        |
+| preventSecondCall<br/>IfDataIsUnchanged | boolean [=true] | Determines whether the `observable.next()` should be invoked again when the refreshed data is identical to the stale data.<br/><b>By default</b>, the `observable.next()` is invoked only once in such cases, optimizing to prevent unnecessary rerenders in applications.<br/>If desired, you can pass `false` and perform your own check within your application.<br/>For a detailed explanation, please refer to the <a href="#refresh">How Refreshing Works with RxJS Subscribers</a> section. |
+| removeNullValues                  | boolean [=true] | Determines whether null values should be removed from query parameters or not.                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| devtool                           | object [:?]     | Developer tool configuration. See <a href="#devtool-params">Devtool Available  Parameters</a>.                                                                                                                                                                                                                                                                                                                                                                                                   |
 
 <br></br>
 
