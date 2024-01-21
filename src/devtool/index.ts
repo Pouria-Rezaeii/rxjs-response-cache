@@ -174,10 +174,11 @@ function generateControlsBox(onClickCacheStateButton: (state: any) => void) {
    });
 
    const logCacheButton = createElement({
-      innerHtml: "Log Cache Last State",
+      innerHtml: "Log Cache State",
       class: "devtool-button",
       styles: styles.logCacheButton,
       onClick: onClickCacheStateButton,
+      title: "Log Cache Last State",
    });
 
    const clearDevtoolButton = createElement({
