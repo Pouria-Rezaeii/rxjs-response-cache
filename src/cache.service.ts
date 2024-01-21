@@ -2,7 +2,6 @@ import {CacheConfigType, ObservableConfig, CleanQueryOptions} from "./types/cach
 import {Observable, Subscriber} from "rxjs";
 import {rearrangeUrl} from "./utils/rearrange-url";
 import {getMatchedKeys} from "./utils/get-matched-keys";
-import {attachDevtool, updateDevtool} from "./devtool";
 import {
    addTimeoutToLocalStorage,
    clearAllTimeoutsInLocalStorage,
@@ -64,22 +63,29 @@ export class CacheService {
       this._showDevtool =
          config.isDevMode &&
          (config.devtool?.show !== undefined ? config.devtool.show : defaults.devtool.show);
-      this._showDevtool &&
-         attachDevtool({
-            devtoolConfig: config.devtool,
-            onClickCacheStateButton: () => console.log(mapToObject(this._cachedData)),
+      if (this._showDevtool) {
+         import("./devtool").then((m) => {
+            m.attachDevtool({
+               devtoolConfig: config.devtool,
+               onClickCacheStateButton: () => console.log(mapToObject(this._cachedData)),
+            });
          });
+      }
       // removing all possible saved timeouts ids from the last render (probably lost because of hot reload)
       this._isDev && clearAllTimeoutsInLocalStorage();
    }
 
    private _updateDevtool(url: string, status: string, data: any) {
-      updateDevtool({
-         url: url,
-         status: status,
-         data: data,
-         cacheState: mapToObject(this._cachedData),
-      });
+      if (this._showDevtool) {
+         import("./devtool").then((m) => {
+            m.updateDevtool({
+               url: url,
+               status: status,
+               data: data,
+               cacheState: mapToObject(this._cachedData),
+            });
+         });
+      }
    }
 
    /**
