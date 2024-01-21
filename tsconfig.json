@@ -1,8 +1,8 @@
 {
    "compilerOptions": {
       "allowSyntheticDefaultImports": true,
-      "module": "commonjs",
-      "target": "es2015" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+      "module": "es2020",
+      "target": "es6" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
       "rootDir": "./src" /* Specify the root folder within your source files. */,
       "outDir": "./dist" /* Specify an output folder for all emitted files. */,
       "strict": true /* Enable all strict type-checking options. */,
