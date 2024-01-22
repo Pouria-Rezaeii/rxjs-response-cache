@@ -197,33 +197,33 @@ export function addDefaultStyles() {
             line-height: 1.5;
          }
       
-         .devtool-button:hover {
+         #devtool-container .devtool-button:hover {
             transition: .2s;
             filter: saturate(1.15) brightness(115%);
          }
       
-         .primary-color {
+         #devtool-container .primary-color {
             color: ${primaryColor} !important;
          }
       
-         input::placeholder {
+         #devtool-container input::placeholder {
             color: #ffffff66;
          }
       
-         ::selection {
+         #devtool-container::selection {
             color: #ffffff;
             background-color: ${primaryColor};
          }
       
-         #devtool-list::-webkit-scrollbar {
+         #devtool-container #devtool-list::-webkit-scrollbar {
             width: 5px;
          }
       
-         #devtool-list::-webkit-scrollbar-track {
+         #devtool-container #devtool-list::-webkit-scrollbar-track {
             background-color: #ffffff18;
          }
       
-         #devtool-list::-webkit-scrollbar-thumb {
+         #devtool-container #devtool-list::-webkit-scrollbar-thumb {
             background-color: #ffffff66;
          }
       </style>`
