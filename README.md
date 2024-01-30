@@ -3,11 +3,11 @@ RxJS cache response is a lightweight, zero-dependencies, client-side package,
 designed to improve user experience in applications where data remains static
 or changes infrequently during user browsing.
 
-By caching responses from RxJS GET method calls, this package ensures users won't hit
+By caching responses fetched by RxJS Observables, this package ensures users won't hit
 unnecessary delays. When stale data is available, users will see it immediately, cutting down
 wait times and creating a seamless browsing experience.
 
-#### Check the <a href="https://rxjs-cache-service-live-demo.vercel.app/" target="_blank">Live Demo</a>
+#### Check the <a href="https://rxjs-cache-service-live-demo.vercel.app/">Live Demo</a>
 
 ### <section id="features"> Main Features </section>
 - Global accessibility throughout the application.
@@ -28,6 +28,7 @@ wait times and creating a seamless browsing experience.
 -  <a href="#prefetch"> Prefetching </a>
 -  <a href="#clean"> Cleaning the Data </a>
 -  <a href="#reset"> Resetting the Cache </a>
+-  <a href="#update"> Updating the Cache </a>
 -  <a href="#refresh"> How Refreshing Works with RxJS Subscribers </a>
 -  <a href="#multiple-instances"> Multiple Instances </a>
 -  <a href="#bulk"> Bulk Operations </a>
@@ -50,7 +51,7 @@ yarn add rxjs-cache-service
 
 Instantiate the cache service at the root of your application or any other location within the components tree.
 ```ts
-const cacheService = new CacheService({
+const cache = new CacheService({
    isDevMode: process.env.MODE === "development",
    devtool: {
       show: true,
@@ -76,12 +77,12 @@ For a deeper understanding, refer to the <a href="#structure"> Cache Structure a
 Method 1 ( Using arrangedUrl ):
 ```ts
 const getPosts = () => {
-   return cacheService.get<Post[]>({
+   return cache.get<Post[]>({
       url: "posts",
       defaultParams: {page: 1, "page-size": 20},
       params: urlParamsObject,
-      observable: ({arrangedUrl}) => observable<Post[]>(arrangedUrl).pipe(your_operations),
-   });
+      observable: ({arrangedUrl}) => observable<Post[]>(arrangedUrl),
+   }).pipe(your_operations);
 }
 ```
 
@@ -90,15 +91,19 @@ Method 2 ( Ignoring arrangedUrl argument and working with your own data ):
 const getPosts = () => {
    const url = "posts";
    const params = urlParamsObject;
-   return cacheService.get<Post[]>({
+   return cache.get<Post[]>({
       url: url,
       defaultParams: {page: 1, "page-size": 20},
       params: params,
-      observable: () => observable<Post[]>(url, {params}).pipe(your_operations),
-   });
+      observable: () => observable<Post[]>(url, {params}),
+   }).pipe(your_operations);
 }
 ```
 Read the following section to understand <b>when to use each method</b>?
+
+<b>Best practice:</b> Chain the `pipe()`s to the `get()` method, not the passed observable.
+This ensures that the actual API response, not a potentially modified version, is stored in the cache,
+and prevents potential bugs when working with the same API but different operations in separate modules.
 
 <b>Important Hint:</b>  Ensure that you also provide the parameters (if they exist) 
 to the get() method. This is essential as the service uses all query parameters to generate unique keys.
@@ -126,7 +131,7 @@ If this behavior doesn't meet your needs, consider using the second method and w
 ### <section id="angular"> Usage Example in Angular </section>
 Hint: Ensure you have read the <a href="#usage"> Usage Example </a> section first.
 ```ts
-function cacheServiceFactory() {
+function cacheFactory() {
    return new CacheService({
       isDevMode: isDevMode(),
       devtool: your_desired_options,
@@ -135,7 +140,7 @@ function cacheServiceFactory() {
 
 @NgModule({
    providers: [
-      {provide: CacheService, useFactory: cacheServiceFactory},
+      {provide: CacheService, useFactory: cacheFactory},
    ],
 })
 ```
@@ -143,7 +148,7 @@ function cacheServiceFactory() {
 And start using it in your services:
 ```ts
 getPosts = () => {
-   return this._cacheService.get<Post[]>({
+   return this._cache.get<Post[]>({
       url: "posts",
       observable: ({arrangedUrl}) => this._httpClient.get<Post[]>(arrangedUrl),
       ...other_params,
@@ -158,11 +163,10 @@ getPost().subscribe();
 
 
 ### <section id="structure"> Cache Structure and Auto-Generated Keys </section>
-The cache is a map of auto-generated keys and the data reshaped by your potential
-operations (not the actual API response). For example, a code snippet like this:
+The cache is a map of auto-generated keys and the data. For example, a code snippet like this:
 ```ts
 const getPosts = () => {
-   return cacheService.get<Post[]>({
+   return cache.get<Post[]>({
       url: "posts",
       defaultParams: {page: 1 },
       params: {
@@ -171,57 +175,29 @@ const getPosts = () => {
          "end-date": some_date,
          "some-other-param": is_undefined_for_now 
       },
-      observable: ({arrangedUrl}) => observable<Post[]>(arrangedUrl)
-         .pipe(map((res) => res_with_some_changes )),
-   });
+      observable: ({arrangedUrl}) => observable<Post[]>(arrangedUrl),
+   }).pipe(your_operations);
 }
 ```
+
 Will update the cache to this:
 ```ts
 const cache = {
-   "posts? end-date=some_date & page=some_number & start-date=some_date": res_with_your_changes
+   "posts? end-date=some_date & page=some_number & start-date=some_date": res
 }
 ```
-If you also pass the uniqueIdentifier parameter:
-```ts
-const getPosts = () => {
-   return cacheService.get<Post[]>({
-      uniqueIdentifier: "tweaked_posts",
-      url: "posts",
-      ...other_params 
-   });
-}
-```
-The cache will end up like this:
-```ts
-const cache = {
-   "tweked_posts__posts? end-date=some_date & page=some_number & start-date=some_date": res_with_your_changes
-}
-````
+<b>Please note</b> that the query parameters are sorted and undefined value is removed. 
 
-<b>Please note</b> that the query parameters are sorted, undefined value is removed and the stored data
-is the changed version.
+`arrangedUrl` passed as an argument to your observable is essentially this auto-generated key.
 
-<b>In most cases</b> you don't need to pass `uniqueIdentifier`.
-Refer to the next section to understand when it's necessary.
-
-<b>`arrangedUrl`</b> passed as an argument to your observable is essentially this auto-generated key
-but <b>without</b> the unique identifier part.
+<b>Best practice:</b> Chain the `pipe()`s to the `get()` method, not the passed observable.
+This ensures that the actual API response, not a potentially modified version, is stored in the cache,
+and prevents potential bugs when working with the same API but different operations in separate modules.
 
 ### <section id="uid"> Determining When to Use a Unique Identifier </section>
-As you can see in the previous section, the data stored in the cache is not always the raw version
-of the response. This <b>will lead to conflicts</b> in some rare situations when you are working
-with the same API but with different operations in different modules.
-
-
-Imagine a situation where module A has called the API ("/posts"), and the tweaked version of the
-response is stored in the cache. When module B calls the same API with different operations
-(as it needs a distinct version of the data), if the `uniqueIdentifier` is NOT passed
-in both modules, the cache service generates the key, resulting in the exact same key.
-Consequently, it notifies the module B subscriber with incorrect data.
-
-<b>To prevent these types of conflicts</b> you can use the `uniqueIdentifier`
-parameter to distinguish between them.
+This value, if present, will be added to the auto-generated key for storing the data.
+In most cases (99.99%), it's unnecessary. Consider using it only if you must differentiate
+between two data types which are going to generate the exact same key.
 
 ### <section id="prefetch"> Prefetching </section>
 Simply subscribe to your API handler, and the result will be stored in the cache for later use.
@@ -244,36 +220,38 @@ const cache = {
     "posts?page=1&comments=true" : data,
     "posts?page=2": data,
     "tweaked_posts__posts?page=1" : tweakedData,
-    "tweaked_posts__posts?page=1&comments=true" : tweakedData,
 }
 ```
 
 To clean all the keys containing "posts" & page=1 (matches the 2 first keys):
 ```ts
-cacheService.clean('posts',{ queryParams: { page: 1} })
+cache.clean('posts',{ queryParams: { page: 1} })
 ```
 
 To clean one key, containing "posts" & page=1 (exact match):
 ```ts
-cacheService.clean('posts',{ queryParams: { page: 1}, exact: true })
+cache.clean('posts',{ queryParams: { page: 1}, exact: true })
 ```
 
 <b>Please note</b> that neither of the above examples removes
 the fourth and fifth keys because uniqueIdentifier is not included in the options.
 
-To clean all the keys containing "posts" & comments=true & uid=tweaked_posts (matches only the fifth key):
+To clean all the keys containing "posts" & uid=tweaked_posts (matches only the forth key):
 ```ts
-cacheService.clean('posts',{ uniqueIdentifier: "tweaked_posts", queryParams: { comments: true} })
+cache.clean('posts',{ uniqueIdentifier: "tweaked_posts", queryParams: { comments: true} })
 ```
 
 See <a href="#clean-params">Clean Method Available Parameters</a>
 
 ### <section id="reset"> Resetting the Cache </section>
-The `resetCache()` method clears the entire cache.
-
+The `reset()` method clears the entire cache.
 ```ts
-cacheService.resetCache();
+cache.reset();
 ```
+
+### <section id="update"> Updating the Cache </section>
+<b>Coming Soon:</b> Update functionality is slated for the next minor version release!
+
 
 ### <section id="refresh"> How Refreshing Works with RxJS Subscribers </section>
 If the data is not present in the cache, `subscriber.next()` and `subscriber.complete()` are triggered
@@ -294,20 +272,24 @@ Using multiple instances of the service is supported, but the devtool
 should be used with one instance at a time.
 
 ### <section id="bulk"> Bulk Operations </section>
-Bulk operations, such as forkJoin, are not supported in this version.
+The `get()` method returns a new observable, so use it with bulk operations as usual.
+Example:
+```ts
+const res = forkJoin({ foo: cache.get(), bar: cache.get() })
+```
 
 ### <section id="null-ignore"> Null Values in Query Params </section>
 Null values are ignored from query parameters by default. This behavior can be changed
 in the cache configuration at instantiation.
 
-See <a href="#config-params">Configuration Available Parameters</a>
+See <a href="#config-params"> Configuration Available Parameters </a>
 
 ### <section id="devtool"> Developer Tool </section>
 The integrated developer tool allows you to inspect the last state
 of the cache and its history of changes. Additionally, every event
 related to the cache will be logged in the tool.
 
-See <a href="#devtool-params">Devtool Available  Parameters</a>
+See <a href="#devtool-params"> Devtool Available  Parameters </a>
 
 ### <section id="tables"> API Reference </section>
 
@@ -316,7 +298,7 @@ See <a href="#devtool-params">Devtool Available  Parameters</a>
 | Name                              | Type            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 |:----------------------------------|:----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | isDevMode                         | boolean         | In dev mode, clear timeout IDs will be stored in local storage to be cleared in possible hot-reloads. This ensures that the devtool does not display incorrect information from previous loads during development.<br/><b>Additionally</b>, the devtool is available only in dev mode.                                                                                                                                                                                                           |
-| paramsObjectOverwrites-<br/>UrlQueries | boolean [=true] | Determines how the service should behave if a query parameter is accidentally present in both the url parameter and the params parameter.<br/><b>Example</b>: `cacheService.get({url: "/posts?page=2", params: {page: 3}, observable:() => observable})` by default will be resolved to `"/post?page=3"`.                                                                                                                                                                                        |
+| paramsObjectOverwrites-<br/>UrlQueries | boolean [=true] | Determines how the service should behave if a query parameter is accidentally present in both the url parameter and the params parameter.<br/><b>Example</b>: `cache.get({url: "/posts?page=2", params: {page: 3}, observable:() => observable})` by default will be resolved to `"/post?page=3"`.                                                                                                                                                                                        |
 | preventSecondCall<br/>IfDataIsUnchanged | boolean [=true] | Determines whether the `observable.next()` should be invoked again when the refreshed data is identical to the stale data.<br/><b>By default</b>, the `observable.next()` is invoked only once in such cases, optimizing to prevent unnecessary rerenders in applications.<br/>If desired, you can pass `false` and perform your own check within your application.<br/>For a detailed explanation, please refer to the <a href="#refresh">How Refreshing Works with RxJS Subscribers</a> section. |
 | removeNullValues                  | boolean [=true] | Determines whether null values should be removed from query parameters or not.                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | devtool                           | object [:?]     | Developer tool configuration. See <a href="#devtool-params">Devtool Available  Parameters</a>.                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -325,14 +307,14 @@ See <a href="#devtool-params">Devtool Available  Parameters</a>
 
 #### <section id="instance-params"> Service Instance Methods & Properties </section>
 
-| Name    | Type     | Description                                                            |
-|:--------|:---------|:-----------------------------------------------------------------------|
-| get()   | function | Fetches data and stores the expected result in the cache.              |
-| clean() | function | Allows you to remove specific data or multiple entries from the cache. |
-| reset() | function | Clears the entire cache.                                            |
-| config   | object   | Configuration passed to the service.                                   |
-| cachedData   | object   | Stored data.                                                           |
-| observables | object   | Stored observables.                                                    |
+| Name          | Type     | Description                                                            |
+|:--------------|:---------|:-----------------------------------------------------------------------|
+| get()         | function | Fetches data and stores the expected result in the cache.              |
+| clean()       | function | Allows you to remove specific data or multiple entries from the cache. |
+| reset()       | function | Clears the entire cache.                                            |
+| config        | object   | Configuration passed to the service.                                   |
+| data          | object   | Stored data.                                                           |
+| observables   | object   | Stored observables.                                                    |
 | clearTimeouts | object   | Active clear timeouts.                                                 |
 
 <br></br>
