@@ -30,7 +30,7 @@ describe("Cache service initialization", () => {
    });
 
    it("Initializes the variables correctly.", () => {
-      expect(cacheService.cachedData).toEqual({});
+      expect(cacheService.data).toEqual({});
       expect(cacheService.observables).toEqual({});
       expect(cacheService.clearTimeouts).toEqual({});
    });

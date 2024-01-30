@@ -265,8 +265,13 @@ export class CacheService {
       });
    }
 
-   /** Clears the entire cache. */
+   /** @deprecated use reset() method instead. */
    public resetCache() {
+      this.reset();
+   }
+
+   /** Clears the entire cache. */
+   public reset() {
       this._cachedData = new Map();
       this._observables = new Map();
       this._clearTimeouts = new Map();
@@ -279,7 +284,12 @@ export class CacheService {
       return {...this._config};
    }
 
+   /** @deprecated use data property instead. */
    get cachedData() {
+      return this.data;
+   }
+
+   get data() {
       return mapToObject(this._cachedData);
    }
 

@@ -20,8 +20,10 @@ describe("Cache service initialization", () => {
          })
       );
 
+      // let be the deprecated version to be tested
       cacheService.resetCache();
 
+      // let be the deprecated version to be tested
       expect(cacheService.cachedData).toEqual({});
       expect(cacheService.observables).toEqual({});
       expect(cacheService.clearTimeouts).toEqual({});

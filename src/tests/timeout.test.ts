@@ -61,7 +61,7 @@ describe("Cache service timeouts", () => {
       );
 
       expect(cacheService.clearTimeouts[currentCounterUrl]).toBeTruthy();
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [currentCounterUrl]: {counter: 1},
       });
 
@@ -77,7 +77,7 @@ describe("Cache service timeouts", () => {
       );
 
       expect(cacheService.clearTimeouts[currentCounterUrl]).toBeTruthy();
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [currentCounterUrl]: {counter: 2},
       });
 
@@ -109,12 +109,12 @@ describe("Cache service timeouts", () => {
       );
       await pause(200);
 
-      expect(cacheService.cachedData[postsUrl]).toBeTruthy();
+      expect(cacheService.data[postsUrl]).toBeTruthy();
    });
 });
 
 function checkVariablesToBeEmpty(cacheService: CacheService) {
-   expect(cacheService.cachedData).toEqual({});
+   expect(cacheService.data).toEqual({});
    expect(cacheService.observables).toEqual({});
    expect(cacheService.clearTimeouts).toEqual({});
 }

@@ -34,7 +34,7 @@ describe("Cache service clean method", () => {
       cacheService.clean(postsUrl);
 
       const expectedKey = "some_uid" + uidSeparator + postsUrl;
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedKey]: posts,
       });
       expect(cacheService.observables[expectedKey]).toBeTruthy();
@@ -60,7 +60,7 @@ describe("Cache service clean method", () => {
 
       cacheService.clean(postsUrl, {uniqueIdentifier: "some_uid"});
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [postsUrl]: posts,
       });
       expect(cacheService.observables[postsUrl]).toBeTruthy();
@@ -76,7 +76,7 @@ describe("Cache service clean method", () => {
       );
 
       cacheService.clean(postsUrl.concat("?a=T"));
-      expect(cacheService.cachedData).toEqual({});
+      expect(cacheService.data).toEqual({});
    });
 
    it("Accepts params in queryParams object", async () => {
@@ -89,7 +89,7 @@ describe("Cache service clean method", () => {
 
       cacheService.clean(postsUrl, {queryParams: {a: "T"}});
 
-      expect(cacheService.cachedData).toEqual({});
+      expect(cacheService.data).toEqual({});
    });
 
    it("Matches only one key if `exact=true` and query params are included in `url` parameter", async () => {
@@ -107,8 +107,8 @@ describe("Cache service clean method", () => {
       );
       cacheService.clean(postsUrl, {exact: true});
 
-      expect(cacheService.cachedData[postsUrl]).toBeFalsy();
-      expect(cacheService.cachedData[postsUrl.concat("?a=T")]).toBeTruthy();
+      expect(cacheService.data[postsUrl]).toBeFalsy();
+      expect(cacheService.data[postsUrl.concat("?a=T")]).toBeTruthy();
    });
 
    it("Matches only one key if `exact=true` and query params are included in `query param` parameter", async () => {
@@ -126,8 +126,8 @@ describe("Cache service clean method", () => {
       );
       cacheService.clean(postsUrl, {exact: true, queryParams: {a: "T"}});
 
-      expect(cacheService.cachedData[postsUrl]).toBeTruthy();
-      expect(cacheService.cachedData[postsUrl.concat("?a=T")]).toBeFalsy();
+      expect(cacheService.data[postsUrl]).toBeTruthy();
+      expect(cacheService.data[postsUrl.concat("?a=T")]).toBeFalsy();
    });
 
    it("Matches as many as possible if `exact=false` and query params are included in `url` parameter", async () => {
@@ -146,7 +146,7 @@ describe("Cache service clean method", () => {
       );
 
       cacheService.clean(postsUrl.concat("?a=T"));
-      expect(cacheService.cachedData).toEqual({});
+      expect(cacheService.data).toEqual({});
    });
 
    it("Matches as many as possible if `exact=false` and query params are included in `query param` parameter", async () => {
@@ -165,6 +165,6 @@ describe("Cache service clean method", () => {
       );
 
       cacheService.clean(postsUrl, {queryParams: {a: "T"}});
-      expect(cacheService.cachedData).toEqual({});
+      expect(cacheService.data).toEqual({});
    });
 });

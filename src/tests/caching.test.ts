@@ -25,7 +25,7 @@ describe("Cache service storing responses", () => {
          );
 
          expect(response).toEqual(posts[0]);
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [firstPostUrl]: posts[0],
          });
          expect(cacheService.observables[firstPostUrl]).toBeTruthy();
@@ -47,7 +47,7 @@ describe("Cache service storing responses", () => {
          );
 
          expect(anotherCall).toEqual({counter: 1});
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [currentCounterUrl]: {counter: 1},
          });
       });
@@ -70,7 +70,7 @@ describe("Cache service storing responses", () => {
             })
          );
 
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [currentCounterUrl]: {counter: 1},
          });
 
@@ -86,7 +86,7 @@ describe("Cache service storing responses", () => {
          );
 
          expect(anotherCallLastResponse).toEqual({counter: 3});
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [currentCounterUrl]: {counter: 3},
          });
       });
@@ -104,7 +104,7 @@ describe("Cache service storing responses", () => {
          const expectedKey = "some_uid" + uidSeparator + firstPostUrl;
 
          expect(response).toEqual(posts[0]);
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [expectedKey]: posts[0],
          });
          expect(cacheService.observables[expectedKey]).toBeTruthy();
@@ -130,7 +130,7 @@ describe("Cache service storing responses", () => {
          const expectedKey = "some_uid" + uidSeparator + currentCounterUrl;
 
          expect(anotherCall).toEqual({counter: 1});
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [expectedKey]: {counter: 1},
          });
       });
@@ -157,7 +157,7 @@ describe("Cache service storing responses", () => {
 
          const expectedKey = "some_uid" + uidSeparator + currentCounterUrl;
 
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [expectedKey]: {counter: 1},
          });
 
@@ -174,7 +174,7 @@ describe("Cache service storing responses", () => {
          );
 
          expect(anotherCallLastResponse).toEqual({counter: 3});
-         expect(cacheService.cachedData).toEqual({
+         expect(cacheService.data).toEqual({
             [expectedKey]: {counter: 3},
          });
       });

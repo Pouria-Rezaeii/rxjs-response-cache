@@ -22,7 +22,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [postsUrl.concat("?a=T")]: posts,
       });
    });
@@ -36,7 +36,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [postsUrl.concat("?a=T")]: posts,
       });
    });
@@ -50,7 +50,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [postsUrl.concat("?a=T")]: posts,
       });
    });
@@ -70,7 +70,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -90,7 +90,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -115,7 +115,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -139,7 +139,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -163,7 +163,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -188,7 +188,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -212,7 +212,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -236,7 +236,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });
@@ -260,7 +260,7 @@ describe("Cache service rearranging url parameters", () => {
          })
       );
 
-      expect(cacheService.cachedData).toEqual({
+      expect(cacheService.data).toEqual({
          [expectedUrl]: posts,
       });
    });

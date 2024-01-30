@@ -61,6 +61,8 @@ function concatParams(input: ConcatParamsInput) {
    return concatenatedParams;
 }
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 function append(source: QueryParams, params: QueryParams, removeNullValues: boolean) {
    const removable = ["", '""', "undefined", "NaN"];
 
