@@ -1,7 +1,7 @@
 {
-   "name": "rxjs-cache-service",
-   "version": "1.0.7",
-   "description": "Global cache service for RxJS observables",
+   "name": "rxjs-response-cache",
+   "version": "1.0.0",
+   "description": "Global cache service for responses fetched by RxJS observables",
    "main": "dist/index.js",
    "types": "dist/index.d.ts",
    "files": [
@@ -9,13 +9,13 @@
    ],
    "author": "Pouria Rezaei",
    "license": "MIT",
-   "homepage": "https://github.com/Pouria-Rezaeii/rxjs-cache-service#readme",
+   "homepage": "https://github.com/Pouria-Rezaeii/rxjs-response-cache#readme",
    "repository": {
       "type": "git",
-      "url": "git+https://github.com/Pouria-Rezaeii/rxjs-cache-service.git"
+      "url": "git+https://github.com/Pouria-Rezaeii/rxjs-response-cache.git"
    },
    "bugs": {
-      "url": "https://github.com/Pouria-Rezaeii/rxjs-cache-service/issues"
+      "url": "https://github.com/Pouria-Rezaeii/rxjs-response-cache/issues"
    },
    "keywords": [
       "rxjs",
