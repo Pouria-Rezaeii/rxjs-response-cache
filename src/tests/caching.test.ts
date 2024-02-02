@@ -1,16 +1,16 @@
 import {firstValueFrom, lastValueFrom} from "rxjs";
-import {CacheService} from "../cache.service";
+import {Cache} from "../index";
 import {observableFunction} from "./utils/observable-function";
 import {currentCounterUrl, firstPostUrl, resetCounterUrl} from "./server/urls";
 import {posts} from "./server/posts";
 import {uidSeparator} from "../constants/uid-separator";
 
 describe("Cache service storing responses", () => {
-   let cacheService: CacheService;
+   let cache: Cache;
 
    beforeEach(async () => {
       observableFunction(resetCounterUrl).subscribe();
-      cacheService = new CacheService({
+      cache = new Cache({
          isDevMode: false,
       });
    });
@@ -18,43 +18,43 @@ describe("Cache service storing responses", () => {
    describe("Without any provided uid", () => {
       it("Fetches and stores the response and the observable correctly.", async () => {
          const response = await lastValueFrom(
-            cacheService.get({
+            cache.get({
                url: firstPostUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
          expect(response).toEqual(posts[0]);
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [firstPostUrl]: posts[0],
          });
-         expect(cacheService.observables[firstPostUrl]).toBeTruthy();
+         expect(cache.observables[firstPostUrl]).toBeTruthy();
       });
 
       it("Uses the cache if data is already present and does not call the api again if `refresh=false`.", async () => {
          await lastValueFrom(
-            cacheService.get({
+            cache.get({
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
          const anotherCall = await lastValueFrom(
-            cacheService.get({
+            cache.get({
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
          );
 
          expect(anotherCall).toEqual({counter: 1});
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [currentCounterUrl]: {counter: 1},
          });
       });
 
       it("Uses the cache and refreshes the data correctly if `refresh=true`.", async () => {
          await lastValueFrom(
-            cacheService.get({
+            cache.get({
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
@@ -63,14 +63,14 @@ describe("Cache service storing responses", () => {
          // the cache is going to be used and the firstValueFrom will return counter = 1
          // the lastValueFrom would be 2 but there is no way to log it here
          await firstValueFrom(
-            cacheService.get({
+            cache.get({
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
                refresh: true,
             })
          );
 
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [currentCounterUrl]: {counter: 1},
          });
 
@@ -78,7 +78,7 @@ describe("Cache service storing responses", () => {
          // but there is no way to log it here
          // we expect the lastValueFrom to be 3
          const anotherCallLastResponse = await lastValueFrom(
-            cacheService.get({
+            cache.get({
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
                refresh: true,
@@ -86,7 +86,7 @@ describe("Cache service storing responses", () => {
          );
 
          expect(anotherCallLastResponse).toEqual({counter: 3});
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [currentCounterUrl]: {counter: 3},
          });
       });
@@ -95,7 +95,7 @@ describe("Cache service storing responses", () => {
    describe("Along with provided uid", () => {
       it("Fetches and stores the response and the observable correctly.", async () => {
          const response = await lastValueFrom(
-            cacheService.get({
+            cache.get({
                uniqueIdentifier: "some_uid",
                url: firstPostUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
@@ -104,15 +104,15 @@ describe("Cache service storing responses", () => {
          const expectedKey = "some_uid" + uidSeparator + firstPostUrl;
 
          expect(response).toEqual(posts[0]);
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [expectedKey]: posts[0],
          });
-         expect(cacheService.observables[expectedKey]).toBeTruthy();
+         expect(cache.observables[expectedKey]).toBeTruthy();
       });
 
       it("Uses the cache if data is already present and does not call the api again if `refresh=false`.", async () => {
          await lastValueFrom(
-            cacheService.get({
+            cache.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
@@ -120,7 +120,7 @@ describe("Cache service storing responses", () => {
          );
 
          const anotherCall = await lastValueFrom(
-            cacheService.get({
+            cache.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
@@ -130,14 +130,14 @@ describe("Cache service storing responses", () => {
          const expectedKey = "some_uid" + uidSeparator + currentCounterUrl;
 
          expect(anotherCall).toEqual({counter: 1});
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [expectedKey]: {counter: 1},
          });
       });
 
       it("Uses the cache and refreshes the data correctly if `refresh=true`.", async () => {
          await lastValueFrom(
-            cacheService.get({
+            cache.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
@@ -147,7 +147,7 @@ describe("Cache service storing responses", () => {
          // the cache is going to be used and the firstValueFrom will return counter = 1
          // the lastValueFrom would be 2 but there is no way to log it here
          await firstValueFrom(
-            cacheService.get({
+            cache.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
@@ -157,7 +157,7 @@ describe("Cache service storing responses", () => {
 
          const expectedKey = "some_uid" + uidSeparator + currentCounterUrl;
 
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [expectedKey]: {counter: 1},
          });
 
@@ -165,7 +165,7 @@ describe("Cache service storing responses", () => {
          // but there is no way to log it here
          // we expect the lastValueFrom to be 3
          const anotherCallLastResponse = await lastValueFrom(
-            cacheService.get({
+            cache.get({
                uniqueIdentifier: "some_uid",
                url: currentCounterUrl,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
@@ -174,7 +174,7 @@ describe("Cache service storing responses", () => {
          );
 
          expect(anotherCallLastResponse).toEqual({counter: 3});
-         expect(cacheService.data).toEqual({
+         expect(cache.data).toEqual({
             [expectedKey]: {counter: 3},
          });
       });

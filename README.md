@@ -1,5 +1,5 @@
-## <section id="beginning"> RxJS Cache Service </section>
-RxJS cache response is a lightweight, zero-dependencies, client-side package,
+## <section id="beginning"> RxJS Response Cache </section>
+RxJS Response Cache is a lightweight, zero-dependencies, client-side package,
 designed to improve user experience in applications where data remains static
 or changes infrequently during user browsing.
 
@@ -7,19 +7,19 @@ By caching responses fetched by RxJS Observables, this package ensures users won
 unnecessary delays. When stale data is available, users will see it immediately, cutting down
 wait times and creating a seamless browsing experience.
 
-#### Check the <a href="https://rxjs-cache-service-live-demo.vercel.app/">Live Demo</a>
+#### Check the <a href="https://rxjs-response-cache-live-demo.vercel.app/">Live Demo</a>
 
-### <section id="features"> Main Features </section>
+## <section id="features"> Main Features </section>
 - Global accessibility throughout the application.
+- Uses stale data during refresh.
 - Accelerates data access.
 - Reduces network requests.
-- Uses stale data during refresh.
 - Simplifies prefetching.
 - Includes clear timeouts for precise caching control.
 - Integrated DevTool for visual cache event inspection.
 - Designed for easy use.
 
-### Document Main Sections
+## Document Main Sections
 -  <a href="#features"> Main Features </a>
 -  <a href="#usage"> Usage Examples </a>
 -  <a href="#angular"> Usage in Angular </a>
@@ -37,7 +37,7 @@ wait times and creating a seamless browsing experience.
 -  <a href="#tables"> API Reference </a>
 
 
-### <section id="usage"> Usage Examples </section>
+## <section id="usage"> Usage Examples </section>
 Install the package:
 
 ```shell
@@ -51,7 +51,9 @@ yarn add rxjs-cache-service
 
 Instantiate the cache service at the root of your application or any other location within the components tree.
 ```ts
-const cache = new CacheService({
+import Cache from 'rxjs-response-cache';
+
+const cache = new Cache({
    isDevMode: process.env.MODE === "development",
    devtool: {
       show: true,
@@ -121,18 +123,20 @@ And then:
 getPost().subscribe();
 ```
 
-### <section id="methods"> Determining When to Use Second Method </section>
+## <section id="methods"> Determining When to Use Second Method </section>
 You may opt for the second method only when there's a specific requirement that is ignored
 in arrangedUrl. In arrangedUrl, all empty strings, undefined, and null values are automatically
 removed (ignoring null values can be configured). Additionally, duplicated query parameters
 are overwritten, and you should concatenate them with commas if you genuinely need all of them.
 If this behavior doesn't meet your needs, consider using the second method and work with your own data.
 
-### <section id="angular"> Usage Example in Angular </section>
+## <section id="angular"> Usage Example in Angular </section>
 Hint: Ensure you have read the <a href="#usage"> Usage Example </a> section first.
 ```ts
+import Cache from 'rxjs-response-cache';
+
 function cacheFactory() {
-   return new CacheService({
+   return new Cache({
       isDevMode: isDevMode(),
       devtool: your_desired_options,
    });
@@ -140,7 +144,7 @@ function cacheFactory() {
 
 @NgModule({
    providers: [
-      {provide: CacheService, useFactory: cacheFactory},
+      {provide: Cache, useFactory: cacheFactory},
    ],
 })
 ```
@@ -162,7 +166,7 @@ getPost().subscribe();
 ```
 
 
-### <section id="structure"> Cache Structure and Auto-Generated Keys </section>
+## <section id="structure"> Cache Structure and Auto-Generated Keys </section>
 The cache is a map of auto-generated keys and the data. For example, a code snippet like this:
 ```ts
 const getPosts = () => {
@@ -194,18 +198,18 @@ const cache = {
 This ensures that the actual API response, not a potentially modified version, is stored in the cache,
 and prevents potential bugs when working with the same API but different operations in separate modules.
 
-### <section id="uid"> Determining When to Use a Unique Identifier </section>
+## <section id="uid"> Determining When to Use a Unique Identifier </section>
 This value, if present, will be added to the auto-generated key for storing the data.
 In most cases (99.99%), it's unnecessary. Consider using it only if you must differentiate
 between two data types which are going to generate the exact same key.
 
-### <section id="prefetch"> Prefetching </section>
+## <section id="prefetch"> Prefetching </section>
 Simply subscribe to your API handler, and the result will be stored in the cache for later use.
 ```ts
 getPost().subscribe();
 ```
 
-### <section id="clean"> Cleaning the Data </section>
+## <section id="clean"> Cleaning the Data </section>
 The clean() method allows you to remove specific data or multiple entries from the cache.
 
 <b>Hint: </b> if you used `uniqueIdentifier`, make sure to include it in the second parameter.
@@ -243,17 +247,17 @@ cache.clean('posts',{ uniqueIdentifier: "tweaked_posts", queryParams: { comments
 
 See <a href="#clean-params">Clean Method Available Parameters</a>
 
-### <section id="reset"> Resetting the Cache </section>
+## <section id="reset"> Resetting the Cache </section>
 The `reset()` method clears the entire cache.
 ```ts
 cache.reset();
 ```
 
-### <section id="update"> Updating the Cache </section>
+## <section id="update"> Updating the Cache </section>
 <b>Coming Soon:</b> Update functionality is slated for the next minor version release!
 
 
-### <section id="refresh"> How Refreshing Works with RxJS Subscribers </section>
+## <section id="refresh"> How Refreshing Works with RxJS Subscribers </section>
 If the data is not present in the cache, `subscriber.next()` and `subscriber.complete()` are triggered
 when the request is resolved.
 
@@ -267,31 +271,31 @@ even if the data is identical to the cached version.
 <b>Please note</b> that you should stop rendering spinners and skeletons into the `next()` function not the `complete()`,
 when using the refresh feature.
 
-### <section id="multiple-instances"> Multiple Instances </section>
+## <section id="multiple-instances"> Multiple Instances </section>
 Using multiple instances of the service is supported, but the devtool
 should be used with one instance at a time.
 
-### <section id="bulk"> Bulk Operations </section>
+## <section id="bulk"> Bulk Operations </section>
 The `get()` method returns a new observable, so use it with bulk operations as usual.
 Example:
 ```ts
 const res = forkJoin({ foo: cache.get(), bar: cache.get() })
 ```
 
-### <section id="null-ignore"> Null Values in Query Params </section>
+## <section id="null-ignore"> Null Values in Query Params </section>
 Null values are ignored from query parameters by default. This behavior can be changed
 in the cache configuration at instantiation.
 
 See <a href="#config-params"> Configuration Available Parameters </a>
 
-### <section id="devtool"> Developer Tool </section>
+## <section id="devtool"> Developer Tool </section>
 The integrated developer tool allows you to inspect the last state
 of the cache and its history of changes. Additionally, every event
 related to the cache will be logged in the tool.
 
 See <a href="#devtool-params"> Devtool Available  Parameters </a>
 
-### <section id="tables"> API Reference </section>
+## <section id="tables"> API Reference </section>
 
 #### <section id="config-params"> Configuration Parameters </section>
 

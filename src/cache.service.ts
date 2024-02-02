@@ -20,7 +20,7 @@ import {uidSeparator} from "./constants/uid-separator";
  *
  * @description Instantiate the cache service at the root of your application or any other location within the components tree.
  * */
-export class CacheService {
+export class Cache {
    private readonly _isDev: boolean;
    private readonly _showDevtool: boolean;
    private readonly _config: CacheConfigType;
@@ -265,7 +265,7 @@ export class CacheService {
       });
    }
 
-   /** @deprecated use reset() method instead. */
+   /** @deprecated Use reset() method instead. */
    public resetCache() {
       this.reset();
    }
@@ -284,7 +284,7 @@ export class CacheService {
       return {...this._config};
    }
 
-   /** @deprecated use data property instead. */
+   /** @deprecated Use data property instead. */
    get cachedData() {
       return this.data;
    }

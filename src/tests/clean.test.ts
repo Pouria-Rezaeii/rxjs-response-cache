@@ -1,15 +1,15 @@
 import {lastValueFrom} from "rxjs";
-import {CacheService} from "../cache.service";
+import {Cache} from "../index";
 import {observableFunction} from "./utils/observable-function";
 import {postsUrl} from "./server/urls";
 import {posts} from "./server/posts";
 import {uidSeparator} from "../constants/uid-separator";
 
 describe("Cache service clean method", () => {
-   let cacheService: CacheService;
+   let cacheService: Cache;
 
    beforeEach(() => {
-      cacheService = new CacheService({
+      cacheService = new Cache({
          isDevMode: false,
       });
    });

@@ -1,9 +1,10 @@
 import {lastValueFrom} from "rxjs";
-import {CacheService} from "../cache.service";
+import {CacheService} from "../index";
 import {postsUrl} from "./server/urls";
 import {observableFunction} from "./utils/observable-function";
 
 describe("Cache service initialization", () => {
+   // let be the deprecated version to be tested
    let cacheService: CacheService;
 
    beforeEach(() => {

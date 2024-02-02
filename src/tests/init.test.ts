@@ -1,8 +1,8 @@
-import {CacheService} from "../cache.service";
+import {Cache} from "../index";
 import {CacheConfigType} from "../types/cache.type";
 
 describe("Cache service initialization", () => {
-   let cacheService: CacheService;
+   let cache: Cache;
    const config: CacheConfigType = {
       isDevMode: false,
       paramsObjectOverwritesUrlQueries: false,
@@ -22,16 +22,16 @@ describe("Cache service initialization", () => {
    };
 
    beforeAll(() => {
-      cacheService = new CacheService(config);
+      cache = new Cache(config);
    });
 
    it("Initializes the config correctly.", () => {
-      expect(cacheService.config).toEqual(config);
+      expect(cache.config).toEqual(config);
    });
 
    it("Initializes the variables correctly.", () => {
-      expect(cacheService.data).toEqual({});
-      expect(cacheService.observables).toEqual({});
-      expect(cacheService.clearTimeouts).toEqual({});
+      expect(cache.data).toEqual({});
+      expect(cache.observables).toEqual({});
+      expect(cache.clearTimeouts).toEqual({});
    });
 });

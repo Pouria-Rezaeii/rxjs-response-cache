@@ -1,15 +1,15 @@
-import {CacheService} from "../cache.service";
+import {Cache} from "../index";
 import {firstValueFrom, lastValueFrom} from "rxjs";
 import {observableFunction} from "./utils/observable-function";
 import {notFoundException, internalServerErrorException} from "./server/errors";
 import {resetCounterUrl, currentCounterUrl} from "./server/urls";
 
 describe("Cache service error handling", () => {
-   let cacheService: CacheService;
+   let cache: Cache;
 
    beforeEach(async () => {
       observableFunction(resetCounterUrl).subscribe();
-      cacheService = new CacheService({
+      cache = new Cache({
          isDevMode: false,
       });
    });
@@ -17,7 +17,7 @@ describe("Cache service error handling", () => {
    it("Throws the error correctly if request fails.", async () => {
       try {
          await firstValueFrom(
-            cacheService.get({
+            cache.get({
                url: "/not-exist-rul",
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
             })
@@ -29,14 +29,14 @@ describe("Cache service error handling", () => {
 
    it("Returns the cached date and throws the error correctly if refresh request fails.", async () => {
       await firstValueFrom(
-         cacheService.get({
+         cache.get({
             url: currentCounterUrl,
             observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
 
       const anotherCallFirstResponse = await firstValueFrom(
-         cacheService.get({
+         cache.get({
             url: currentCounterUrl,
             refresh: true,
             observable: ({arrangedUrl}) => observableFunction(arrangedUrl, {throwError: true}),
@@ -46,7 +46,7 @@ describe("Cache service error handling", () => {
 
       try {
          await lastValueFrom(
-            cacheService.get({
+            cache.get({
                url: currentCounterUrl,
                refresh: true,
                observable: ({arrangedUrl}) => observableFunction(arrangedUrl, {throwError: true}),
