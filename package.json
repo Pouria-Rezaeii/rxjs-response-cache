@@ -1,7 +1,7 @@
 {
    "name": "rxjs-cache-service",
    "version": "1.0.7",
-   "description": "Global cache service for RxJS observables",
+   "description": "Global cache service for responses fetched by RxJS observables",
    "main": "dist/index.js",
    "types": "dist/index.d.ts",
    "files": [
