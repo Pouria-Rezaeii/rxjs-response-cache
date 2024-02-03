@@ -1,2 +1,4 @@
 /node_moduels
 /dist
+lint-staged.config.js
+babel.config.js

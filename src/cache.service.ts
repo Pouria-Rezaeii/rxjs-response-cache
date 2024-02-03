@@ -12,7 +12,7 @@ import {mapToObject} from "./utils/map-to-object";
 import {uidSeparator} from "./constants/uid-separator";
 
 /**
- * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#beginning}}
+ * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#beginning}}
  *
  * @usageNote Multiple instances is supported, but the devtool SHOULD be used with one instance at a time
  *
@@ -31,7 +31,7 @@ export class ResponseCache {
    /**
     * @description Global caching service for RxJS GET responses.
     *
-    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#usage}
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#usage}
     *
     * @usageNote Multiple instances is supported, but the devtool SHOULD be used with one instance at a time
     *
@@ -48,7 +48,7 @@ export class ResponseCache {
     *
     * @param preventSecondCallIfDataIsUnchanged --- [ default=true ] Determines whether the `observable.next()` should be invoked again when the refreshed data is identical to the stale data.<br/><br/>By default, the observable.next() is invoked only once in such cases, optimizing to prevent unnecessary rerenders in applications.<br/><br/>If desired, you can pass `false` and perform your own check within your application.
     *
-    * @param devtool --- Developer tool configuration. See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#devtool-params">Devtool Available  Parameters</a>.
+    * @param devtool --- Developer tool configuration. See <a href="https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#devtool-params">Devtool Available  Parameters</a>.
     */
    constructor(config: CacheConfigType) {
       this._config = {
@@ -89,7 +89,7 @@ export class ResponseCache {
    }
 
    /**
-    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#usage}
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#usage}
     *
     * @usageNote the method combines params, defaultParams and query strings contained in the url, orders them alphabetically, removes the empty strings, and undefined values and uses them as the key to store the response.
     *
@@ -97,9 +97,9 @@ export class ResponseCache {
     *
     * @param url --- The endpoint address (may include query parameters or not).
     *
-    * @param observable --- The callback function that returns an observable. It receives an object containing the `arrangedUrl` as input.<br/>See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#structure"> Cache Structure and Auto-Generated Keys </a> for details.
+    * @param observable --- The callback function that returns an observable. It receives an object containing the `arrangedUrl` as input.<br/>See <a href="https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#structure"> Cache Structure and Auto-Generated Keys </a> for details.
     *
-    * @param (uniqueIdentifier) --- This value, if present, will be added to the auto-generated key for storing the data.<br/>See <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#uid"> When to Use Unique Identifier </a>.
+    * @param (uniqueIdentifier) --- This value, if present, will be added to the auto-generated key for storing the data.<br/>See <a href="https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#uid"> When to Use Unique Identifier </a>.
     *
     * @param defaultParams --- The API's default query parameters.<br/>To optimize cache results, ensure to include them if they can be altered by the end-user.
     *
@@ -109,7 +109,7 @@ export class ResponseCache {
     *
     * @param clearTimeout --- The time in milliseconds used to remove the data from the cache.
     *
-    * @returns a new brand observable --- check this <a href="https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#refresh"> Link </a> for more details.
+    * @returns a new brand observable --- check this <a href="https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#refresh"> Link </a> for more details.
     */
    public get<T = unknown>(config: ObservableConfig<T>): Observable<T> {
       const {uniqueIdentifier: uid, url: _rawUrl, refresh, clearTimeout} = config;
@@ -226,7 +226,7 @@ export class ResponseCache {
    }
 
    /**
-    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-cache-service?tab=readme-ov-file#clean}
+    * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#clean}
     *
     * @usageNote Query params can be included in both the key argument or the `options.params` parameter. Before searching, query params will be sorted and possibly truncated.
     *

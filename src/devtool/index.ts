@@ -48,7 +48,7 @@ function attachToggleButton() {
    }
 
    const toggleButton = createElement({
-      innerHtml: `<img src=${iconBase64} alt="rxjs-cache-service" style="width: 24px;height: 24px"/>`,
+      innerHtml: `<img src=${iconBase64} alt="rxjs-response-cache" style="width: 24px;height: 24px"/>`,
       id: ids.toggleButton,
       class: "devtool-button",
       styles: styles.toggleButton(config?.styles),
@@ -96,7 +96,7 @@ function generateTitleBox() {
       styles: {display: "flex", gap: "4px", alignItems: "center"},
    });
 
-   const icon = `<img src=${iconBase64} alt="rxjs-cache-service" />`;
+   const icon = `<img src=${iconBase64} alt="rxjs-response-cache" />`;
 
    const title = createElement({
       tagName: "p",
