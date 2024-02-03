@@ -1,13 +1,25 @@
 ## <section id="beginning"> RxJS Response Cache </section>
-RxJS Response Cache is a lightweight, zero-dependencies, client-side package,
-designed to improve user experience in applications where data remains static
-or changes infrequently during user browsing.
+Have you ever struggled with efficiently caching API responses retrieved through observables?
 
-By caching responses fetched by RxJS Observables, this package ensures users won't hit
-unnecessary delays. When stale data is available, users will see it immediately, cutting down
-wait times and creating a seamless browsing experience.
+It gets trickier, especially when dealing with dynamic filters like pagination in APIs.
+Or consider scenarios where you're confident that a response is unlikely to change during
+a user's visit to your website. However, deciding when to expire the cache becomes a challenge,
+potentially leading to users receiving outdated information or setting such a short expiration time
+that it becomes impractical.
 
-#### Check the <a href="https://rxjs-response-cache-live-demo.vercel.app/">Live Demo</a>
+In many cases, these challenges lead us to skip caching, resulting in less satisfying user experience
+and performance.
+
+Now, let's dive into RxJS Response Cache and see how it streamlines caching.
+
+The package automatically stores a diverse range of responses, assigning them unique keys generated
+from a combination of the URL and alphabetically sorted query parameters. This ensures that each
+distinct response is effortlessly stored and managed.
+
+Also, with its use-stale-while-refreshing feature, not only does it reduce wait times, but it guarantees
+users consistently have the most up-to-date data at their fingertips.
+
+#### Check the <a href="https://rxjs-response-cache-live-demo.vercel.app/"> Live Demo </a>
 
 ## <section id="features"> Main Features </section>
 - Global accessibility throughout the application.
@@ -51,9 +63,9 @@ yarn add rxjs-response-cache
 
 Instantiate the cache service at the root of your application or any other location within the components tree.
 ```ts
-import Cache from 'rxjs-response-cache';
+import ResponseCache from 'rxjs-response-cache';
 
-const cache = new Cache({
+const cache = new ResponseCache({
    isDevMode: process.env.MODE === "development",
    devtool: {
       show: true,
@@ -107,7 +119,7 @@ Read the following section to understand <b>when to use each method</b>?
 This ensures that the actual API response, not a potentially modified version, is stored in the cache,
 and prevents potential bugs when working with the same API but different operations in separate modules.
 
-<b>Important Hint:</b>  Ensure that you also provide the parameters (if they exist) 
+<b>Important Hint:</b> Ensure that you also provide the parameters (if they exist) 
 to the get() method. This is essential as the service uses all query parameters to generate unique keys.
 
 Additionally, to achieve the best possible results from the service, always include your
@@ -133,10 +145,10 @@ If this behavior doesn't meet your needs, consider using the second method and w
 ## <section id="angular"> Usage Example in Angular </section>
 Hint: Ensure you have read the <a href="#usage"> Usage Example </a> section first.
 ```ts
-import Cache from 'rxjs-response-cache';
+import ResponseCache from 'rxjs-response-cache';
 
 function cacheFactory() {
-   return new Cache({
+   return new ResponseCache({
       isDevMode: isDevMode(),
       devtool: your_desired_options,
    });
@@ -144,7 +156,7 @@ function cacheFactory() {
 
 @NgModule({
    providers: [
-      {provide: Cache, useFactory: cacheFactory},
+      {provide: ResponseCache, useFactory: cacheFactory},
    ],
 })
 ```
@@ -152,7 +164,7 @@ function cacheFactory() {
 And start using it in your services:
 ```ts
 getPosts = () => {
-   return this._cache.get<Post[]>({
+   return this.cache.get<Post[]>({
       url: "posts",
       observable: ({arrangedUrl}) => this._httpClient.get<Post[]>(arrangedUrl),
       ...other_params,
@@ -190,9 +202,9 @@ const cache = {
    "posts? end-date=some_date & page=some_number & start-date=some_date": res
 }
 ```
-<b>Please note</b> that the query parameters are sorted and undefined value is removed. 
-
 `arrangedUrl` passed as an argument to your observable is essentially this auto-generated key.
+
+<b>Please note</b> that the query parameters are sorted and undefined value is removed. 
 
 <b>Best practice:</b> Chain the `pipe()`s to the `get()` method, not the passed observable.
 This ensures that the actual API response, not a potentially modified version, is stored in the cache,
