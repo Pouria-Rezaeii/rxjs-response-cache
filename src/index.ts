@@ -1,7 +1,7 @@
-import {Cache} from "./cache.service";
+import {ResponseCache} from "./cache.service";
 
-/** @deprecated Use Cache instead. */
-export class CacheService extends Cache {}
+/** @deprecated Use ResponseCache instead. */
+export class CacheService extends ResponseCache {}
 
-export default Cache;
-export {Cache};
+export default ResponseCache;
+export {ResponseCache};

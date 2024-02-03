@@ -1,5 +1,5 @@
-import {Cache} from "../index";
-import {CacheConfigType} from "../types/cache.type";
+import {ResponseCache as Cache} from "../src/index";
+import {CacheConfigType} from "../src/types/cache.type";
 
 describe("Cache service initialization", () => {
    let cache: Cache;

@@ -1,9 +1,9 @@
 import {firstValueFrom, lastValueFrom} from "rxjs";
-import {Cache} from "../index";
+import {ResponseCache as Cache} from "../src/index";
 import {observableFunction} from "./utils/observable-function";
 import {currentCounterUrl, firstPostUrl, resetCounterUrl} from "./server/urls";
 import {posts} from "./server/posts";
-import {uidSeparator} from "../constants/uid-separator";
+import {uidSeparator} from "../src/constants/uid-separator";
 
 describe("Cache service storing responses", () => {
    let cache: Cache;

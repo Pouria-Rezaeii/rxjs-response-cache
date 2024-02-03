@@ -1,4 +1,4 @@
-import {Cache} from "../index";
+import {ResponseCache as Cache} from "../src/index";
 import {lastValueFrom} from "rxjs";
 import {observableFunction} from "./utils/observable-function";
 import {resetCounterUrl, postsUrl} from "./server/urls";

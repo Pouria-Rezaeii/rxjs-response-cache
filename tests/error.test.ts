@@ -1,4 +1,4 @@
-import {Cache} from "../index";
+import {ResponseCache as Cache} from "../src/index";
 import {firstValueFrom, lastValueFrom} from "rxjs";
 import {observableFunction} from "./utils/observable-function";
 import {notFoundException, internalServerErrorException} from "./server/errors";

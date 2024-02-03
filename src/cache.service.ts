@@ -20,7 +20,7 @@ import {uidSeparator} from "./constants/uid-separator";
  *
  * @description Instantiate the cache service at the root of your application or any other location within the components tree.
  * */
-export class Cache {
+export class ResponseCache {
    private readonly _isDev: boolean;
    private readonly _showDevtool: boolean;
    private readonly _config: CacheConfigType;

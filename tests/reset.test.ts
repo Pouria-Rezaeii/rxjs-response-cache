@@ -1,5 +1,5 @@
 import {lastValueFrom} from "rxjs";
-import {CacheService} from "../index";
+import {CacheService} from "../src/index";
 import {postsUrl} from "./server/urls";
 import {observableFunction} from "./utils/observable-function";
 
