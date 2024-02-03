@@ -41,11 +41,11 @@ wait times and creating a seamless browsing experience.
 Install the package:
 
 ```shell
-npm install rxjs-cache-service --save
+npm install rxjs-response-cache --save
 ```
 or
 ```shell
-yarn add rxjs-cache-service
+yarn add rxjs-response-cache
 ```
 
 
@@ -297,7 +297,7 @@ See <a href="#devtool-params"> Devtool Available  Parameters </a>
 
 ## <section id="tables"> API Reference </section>
 
-#### <section id="config-params"> Configuration Parameters </section>
+### <section id="config-params"> Configuration Parameters </section>
 
 | Name                              | Type            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 |:----------------------------------|:----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -309,7 +309,7 @@ See <a href="#devtool-params"> Devtool Available  Parameters </a>
 
 <br></br>
 
-#### <section id="instance-params"> Service Instance Methods & Properties </section>
+### <section id="instance-params"> Service Instance Methods & Properties </section>
 
 | Name          | Type     | Description                                                            |
 |:--------------|:---------|:-----------------------------------------------------------------------|
@@ -323,7 +323,7 @@ See <a href="#devtool-params"> Devtool Available  Parameters </a>
 
 <br></br>
 
-#### <section id="get-params"> Get Method Parameters </section>
+### <section id="get-params"> Get Method Parameters </section>
 
 | Name             | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                        |
 |:-----------------|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -337,7 +337,7 @@ See <a href="#devtool-params"> Devtool Available  Parameters </a>
 
 <br></br>
 
-#### <section id="clean-params"> Clean Method Parameters </section>
+### <section id="clean-params"> Clean Method Parameters </section>
 
 | Name                     | Type         | Description                                                                                                                                        |
 |:-------------------------|:-------------|:---------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -351,7 +351,7 @@ See <a href="#clean"> Cleaning the data </a> for examples.
 <br></br>
 
 
-#### <section id="devtool-params"> Devtool Parameters </section>
+### <section id="devtool-params"> Devtool Parameters </section>
 ```ts
 type DevtoolConfig = {
    show?: boolean; // default = isDevMode && true
