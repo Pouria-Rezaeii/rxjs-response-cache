@@ -147,14 +147,17 @@ export class ResponseCache {
    }
 
    private _readFromCache<T>(subscriber: Subscriber<T>, key: string, clearTimeout?: number) {
+      const shouldSetClearTimeout = !!clearTimeout && ![this._clearTimeouts.has(key)];
       subscriber.next(this._cachedData.get(key));
       subscriber.complete();
-      let messageText = "❤️ Present in the cache";
-      if (clearTimeout && ![this._clearTimeouts.has(key)]) {
-         this._setClearTimeout(key, clearTimeout, this._cachedData.get(key));
-         messageText += this._getRemovalTimeoutMessage(clearTimeout);
+      shouldSetClearTimeout && this._setClearTimeout(key, clearTimeout, this._cachedData.get(key));
+
+      // DEVTOOL UPDATE
+      if (this._showDevtool) {
+         let messageText = "❤️ Present in the cache";
+         shouldSetClearTimeout && (messageText += this._getRemovalTimeoutMessage(clearTimeout));
+         this._updateDevtool(key, messageText, this._cachedData.get(key));
       }
-      this._showDevtool && this._updateDevtool(key, messageText, this._cachedData.get(key));
    }
 
    private _readFromCacheAndRefresh<T>(
@@ -179,12 +182,14 @@ export class ResponseCache {
                subscriber.next(res);
             }
             subscriber.complete();
-            let messageText = "🔁 Refreshed";
-            if (clearTimeout) {
-               this._setClearTimeout(key, clearTimeout, res);
-               messageText += this._getRemovalTimeoutMessage(clearTimeout);
+            clearTimeout && this._setClearTimeout(key, clearTimeout, res);
+
+            // DEVTOOL UPDATE
+            if (this._showDevtool) {
+               let messageText = "🔁 Refreshed";
+               clearTimeout && (messageText += this._getRemovalTimeoutMessage(clearTimeout));
+               this._updateDevtool(key, messageText, res);
             }
-            this._showDevtool && this._updateDevtool(key, messageText, res);
          },
       });
    }
@@ -196,12 +201,14 @@ export class ResponseCache {
             this._cachedData.set(key, res);
             subscriber.next(res);
             subscriber.complete();
-            let messageText = "✅ Not present, fetched";
-            if (clearTimeout) {
-               this._setClearTimeout(key, clearTimeout, res);
-               messageText += this._getRemovalTimeoutMessage(clearTimeout);
+            clearTimeout && this._setClearTimeout(key, clearTimeout, res);
+
+            // DEVTOOL UPDATE
+            if (this._showDevtool) {
+               let messageText = "✅ Not present, fetched";
+               clearTimeout && (messageText += this._getRemovalTimeoutMessage(clearTimeout));
+               this._updateDevtool(key, messageText, res);
             }
-            this._showDevtool && this._updateDevtool(key, messageText, res);
          },
       });
    }
@@ -282,7 +289,7 @@ export class ResponseCache {
       const key = uid ? uid + uidSeparator + url : url;
       if (this._cachedData.has(key)) {
          const messageText =
-            "⚠ This key is already in the cache. If you intend to update it, consider using the update method instead.";
+            "⛔ This key is already in the cache. If you intend to update it, consider using the update method instead.";
          this._showDevtool && this._updateDevtool(key, messageText, data);
          if (this._isDev) {
             throw new Error("RxJS Response Cache Development Error: " + messageText);
@@ -290,12 +297,14 @@ export class ResponseCache {
          return;
       }
       this._cachedData.set(key, data);
-      let messageText = "➕ New data inserted";
-      if (clearTimeout) {
-         this._setClearTimeout(key, clearTimeout, data);
-         messageText += this._getRemovalTimeoutMessage(clearTimeout);
+      clearTimeout && this._setClearTimeout(key, clearTimeout, data);
+
+      // DEVTOOL UPDATE
+      if (this._showDevtool) {
+         let messageText = "➕ New data inserted";
+         clearTimeout && (messageText += this._getRemovalTimeoutMessage(clearTimeout));
+         this._updateDevtool(key, messageText, data);
       }
-      this._showDevtool && this._updateDevtool(key, messageText, data);
    }
 
    /** @deprecated Use reset() method instead. */
