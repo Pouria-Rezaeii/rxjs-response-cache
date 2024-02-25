@@ -1,6 +1,11 @@
-import {CacheConfigType, ObservableConfig, CleanQueryOptions} from "./types/cache.type";
+import {
+   CacheConfigType,
+   ObservableConfig,
+   CleanQueryOptions,
+   InsertParams,
+} from "./types/cache.type";
 import {Observable, Subscriber} from "rxjs";
-import {rearrangeUrl} from "./utils/rearrange-url";
+import {rearrangeUrl as __rearrangeUrl, RearrangeUrlInput} from "./utils/rearrange-url";
 import {getMatchedKeys} from "./utils/get-matched-keys";
 import {
    addTimeoutToLocalStorage,
@@ -88,6 +93,14 @@ export class ResponseCache {
       }
    }
 
+   private _rearrangeUrl(params: Pick<RearrangeUrlInput, "url" | "params" | "defaultParams">) {
+      return __rearrangeUrl({
+         ...params,
+         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
+         removeNullValues: this._config.removeNullValues!,
+      });
+   }
+
    /**
     * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#usage}
     *
@@ -113,12 +126,10 @@ export class ResponseCache {
     */
    public get<T = unknown>(config: ObservableConfig<T>): Observable<T> {
       const {uniqueIdentifier: uid, url: _rawUrl, refresh, clearTimeout} = config;
-      const url = rearrangeUrl({
+      const url = this._rearrangeUrl({
          url: _rawUrl,
          defaultParams: config.defaultParams,
          params: config.params,
-         paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
-         removeNullValues: this._config.removeNullValues!,
       });
       const key = uid ? uid + uidSeparator + url : url;
       this._observables.set(key, config.observable);
@@ -263,6 +274,28 @@ export class ResponseCache {
                cleanQueryOptions: options || {},
             });
       });
+   }
+
+   public insert(params: InsertParams): void {
+      const {uniqueIdentifier: uid, url: _rawUrl, data, clearTimeout} = params;
+      const url = this._rearrangeUrl({url: _rawUrl, params: params.params});
+      const key = uid ? uid + uidSeparator + url : url;
+      if (this._cachedData.has(key)) {
+         const messageText =
+            "⚠ This key is already in the cache. If you intend to update it, consider using the update method instead.";
+         this._showDevtool && this._updateDevtool(key, messageText, data);
+         if (this._isDev) {
+            throw new Error("RxJS Response Cache Development Error: " + messageText);
+         }
+         return;
+      }
+      this._cachedData.set(key, data);
+      let messageText = "➕ New data inserted";
+      if (clearTimeout) {
+         this._setClearTimeout(key, clearTimeout, data);
+         messageText += this._getRemovalTimeoutMessage(clearTimeout);
+      }
+      this._showDevtool && this._updateDevtool(key, messageText, data);
    }
 
    /** @deprecated Use reset() method instead. */

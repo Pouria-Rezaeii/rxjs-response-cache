@@ -47,6 +47,13 @@ export type ObservableConfig<T> = {
    defaultParams?: QueryParams;
 };
 
+export type InsertParams = Pick<
+   ObservableConfig<any>,
+   "uniqueIdentifier" | "url" | "clearTimeout" | "params"
+> & {
+   data: any;
+};
+
 export type CleanQueryOptions = {
    uniqueIdentifier?: string;
    exact?: boolean;
