@@ -54,7 +54,7 @@ export type InsertParams = Pick<
    data: any;
 };
 
-export type CleanQueryOptions = {
+export type RemoveQueryOptions = {
    uniqueIdentifier?: string;
    exact?: boolean;
    queryParams?: QueryParams;

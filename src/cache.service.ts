@@ -1,8 +1,8 @@
 import {
    CacheConfigType,
    ObservableConfig,
-   CleanQueryOptions,
    InsertParams,
+   RemoveQueryOptions,
 } from "./types/cache.type";
 import {Observable, Subscriber} from "rxjs";
 import {rearrangeUrl as __rearrangeUrl, RearrangeUrlInput} from "./utils/rearrange-url";
@@ -261,7 +261,7 @@ export class ResponseCache {
     * @param queryParams ---  [ <b>available on `options`</b> ] Query Parameters. They will be sorted and truncated if they contain an empty string, undefined, or null (null is configurable).
     *
     */
-   public clean(url: string, options?: CleanQueryOptions) {
+   public remove(url: string, options?: RemoveQueryOptions) {
       const matches = getMatchedKeys({
          source: this._cachedData,
          uniqueIdentifier: options?.uniqueIdentifier,
@@ -307,11 +307,6 @@ export class ResponseCache {
       }
    }
 
-   /** @deprecated Use reset() method instead. */
-   public resetCache() {
-      this.reset();
-   }
-
    /** Clears the entire cache. */
    public reset() {
       this._cachedData = new Map();
@@ -326,11 +321,6 @@ export class ResponseCache {
       return {...this._config};
    }
 
-   /** @deprecated Use data property instead. */
-   get cachedData() {
-      return this.data;
-   }
-
    get data() {
       return mapToObject(this._cachedData);
    }
@@ -341,5 +331,22 @@ export class ResponseCache {
 
    get clearTimeouts() {
       return mapToObject(this._clearTimeouts);
+   }
+
+   // ============= Deprecated =============
+
+   /** @deprecated Use remove() method instead. */
+   public clean(url: string, options?: RemoveQueryOptions) {
+      this.remove(url, options);
+   }
+
+   /** @deprecated Use reset() method instead. */
+   public resetCache() {
+      this.reset();
+   }
+
+   /** @deprecated Use data property instead. */
+   get cachedData() {
+      return this.data;
    }
 }

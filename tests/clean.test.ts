@@ -31,6 +31,7 @@ describe("Cache service clean method", () => {
          })
       );
 
+      // let it be like this to test the deprecated version
       cacheService.clean(postsUrl);
 
       const expectedKey = "some_uid" + uidSeparator + postsUrl;
@@ -58,7 +59,7 @@ describe("Cache service clean method", () => {
          })
       );
 
-      cacheService.clean(postsUrl, {uniqueIdentifier: "some_uid"});
+      cacheService.remove(postsUrl, {uniqueIdentifier: "some_uid"});
 
       expect(cacheService.data).toEqual({
          [postsUrl]: posts,
@@ -75,7 +76,7 @@ describe("Cache service clean method", () => {
          })
       );
 
-      cacheService.clean(postsUrl.concat("?a=T"));
+      cacheService.remove(postsUrl.concat("?a=T"));
       expect(cacheService.data).toEqual({});
    });
 
@@ -87,7 +88,7 @@ describe("Cache service clean method", () => {
          })
       );
 
-      cacheService.clean(postsUrl, {queryParams: {a: "T"}});
+      cacheService.remove(postsUrl, {queryParams: {a: "T"}});
 
       expect(cacheService.data).toEqual({});
    });
@@ -105,7 +106,7 @@ describe("Cache service clean method", () => {
             observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
-      cacheService.clean(postsUrl, {exact: true});
+      cacheService.remove(postsUrl, {exact: true});
 
       expect(cacheService.data[postsUrl]).toBeFalsy();
       expect(cacheService.data[postsUrl.concat("?a=T")]).toBeTruthy();
@@ -124,7 +125,7 @@ describe("Cache service clean method", () => {
             observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
-      cacheService.clean(postsUrl, {exact: true, queryParams: {a: "T"}});
+      cacheService.remove(postsUrl, {exact: true, queryParams: {a: "T"}});
 
       expect(cacheService.data[postsUrl]).toBeTruthy();
       expect(cacheService.data[postsUrl.concat("?a=T")]).toBeFalsy();
@@ -145,7 +146,7 @@ describe("Cache service clean method", () => {
          })
       );
 
-      cacheService.clean(postsUrl.concat("?a=T"));
+      cacheService.remove(postsUrl.concat("?a=T"));
       expect(cacheService.data).toEqual({});
    });
 
@@ -164,7 +165,7 @@ describe("Cache service clean method", () => {
          })
       );
 
-      cacheService.clean(postsUrl, {queryParams: {a: "T"}});
+      cacheService.remove(postsUrl, {queryParams: {a: "T"}});
       expect(cacheService.data).toEqual({});
    });
 });

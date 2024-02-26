@@ -1,4 +1,4 @@
-import {CleanQueryOptions} from "../types/cache.type";
+import {RemoveQueryOptions} from "../types/cache.type";
 import {mapToObject} from "./map-to-object";
 import {rearrangeUrl} from "./rearrange-url";
 import {uidSeparator} from "../constants/uid-separator";
@@ -7,7 +7,7 @@ export function getMatchedKeys(params: {
    source: Map<string, any>;
    uniqueIdentifier?: string;
    url: string;
-   options?: CleanQueryOptions;
+   options?: RemoveQueryOptions;
    paramsObjectOverwrites: boolean;
    removeNullValues: boolean;
 }) {
