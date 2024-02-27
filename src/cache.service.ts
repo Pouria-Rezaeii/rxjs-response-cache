@@ -3,7 +3,9 @@ import {
    ObservableConfig,
    InsertParams,
    RemoveQueryOptions,
-} from "./types/cache.type";
+   UpdateParams,
+   UpdateCallback,
+} from "./types/index.type";
 import {Observable, Subscriber} from "rxjs";
 import {rearrangeUrl as __rearrangeUrl, RearrangeUrlInput} from "./utils/rearrange-url";
 import {getMatchedKeys} from "./utils/get-matched-keys";
@@ -264,7 +266,6 @@ export class ResponseCache {
    public remove(url: string, options?: RemoveQueryOptions) {
       const matches = getMatchedKeys({
          source: this._cachedData,
-         uniqueIdentifier: options?.uniqueIdentifier,
          url,
          options: options,
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
@@ -290,7 +291,8 @@ export class ResponseCache {
       if (this._cachedData.has(key)) {
          const messageText =
             "⛔ This key is already in the cache. If you intend to update it, consider using the update method instead.";
-         this._showDevtool && this._updateDevtool(key, messageText, data);
+         this._showDevtool &&
+            this._updateDevtool(key, messageText, {key: this._cachedData.get(key)});
          if (this._isDev) {
             throw new Error("RxJS Response Cache Development Error: " + messageText);
          }
@@ -307,12 +309,41 @@ export class ResponseCache {
       }
    }
 
+   public update<T>(params: UpdateParams<T>): void {
+      const {uniqueIdentifier: uid, url: _rawUrl, data: _data} = params;
+      const url = this._rearrangeUrl({url: _rawUrl, params: params.params});
+      const key = uid ? uid + uidSeparator + url : url;
+      // todo: handle clearTimeout in next minor version (I should save the previous timeout value in order to using it here)
+
+      if (!this._cachedData.has(key)) {
+         const messageText = "⛔ You intended to update a key which is not present in the cache.";
+         this._showDevtool && this._updateDevtool(key, messageText, {key: undefined});
+         if (this._isDev) {
+            throw new Error("RxJS Response Cache Development Error: " + messageText);
+         }
+         return;
+      }
+
+      const data =
+         typeof _data === "function"
+            ? (_data as UpdateCallback<T>)(this._cachedData.get(key))
+            : _data;
+
+      this._cachedData.set(key, data);
+
+      // DEVTOOL UPDATE
+      if (this._showDevtool) {
+         const messageText = "✎ data updated";
+         this._updateDevtool(key, messageText, data);
+      }
+   }
+
    /** Clears the entire cache. */
    public reset() {
       this._cachedData = new Map();
       this._observables = new Map();
       this._clearTimeouts = new Map();
-      this._showDevtool && this._updateDevtool("ALL", "CACHE CLEARED", "CACHE IS EMPTY.");
+      this._showDevtool && this._updateDevtool("ALL", "CACHE CLEARED", {});
       this._isDev && clearAllTimeoutsInLocalStorage();
    }
 
@@ -333,7 +364,7 @@ export class ResponseCache {
       return mapToObject(this._clearTimeouts);
    }
 
-   // ============= Deprecated =============
+   // ========================================= Deprecated =========================================
 
    /** @deprecated Use remove() method instead. */
    public clean(url: string, options?: RemoveQueryOptions) {

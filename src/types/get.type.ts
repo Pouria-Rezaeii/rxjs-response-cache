@@ -1,14 +1,6 @@
-import {DevtoolConfig} from "../devtool/type";
+import {QueryParams} from "./query-params.type";
 
-export type CacheConfigType = {
-   isDevMode: boolean;
-   paramsObjectOverwritesUrlQueries?: boolean;
-   removeNullValues?: boolean;
-   preventSecondCallIfDataIsUnchanged?: boolean;
-   devtool?: DevtoolConfig;
-};
-
-export type GenericObservable<T> = {
+type GenericObservable<T> = {
    subscribe: (subscriber: PartialObserver<T>) => {
       unsubscribe(): void;
    };
@@ -46,18 +38,3 @@ export type ObservableConfig<T> = {
    params?: QueryParams;
    defaultParams?: QueryParams;
 };
-
-export type InsertParams = Pick<
-   ObservableConfig<any>,
-   "uniqueIdentifier" | "url" | "clearTimeout" | "params"
-> & {
-   data: any;
-};
-
-export type RemoveQueryOptions = {
-   uniqueIdentifier?: string;
-   exact?: boolean;
-   queryParams?: QueryParams;
-};
-
-export type QueryParams = Record<string, string | number | boolean | undefined | null>;

@@ -1,24 +1,17 @@
-import {RemoveQueryOptions} from "../types/cache.type";
+import {RemoveQueryOptions} from "../types/index.type";
 import {mapToObject} from "./map-to-object";
 import {rearrangeUrl} from "./rearrange-url";
 import {uidSeparator} from "../constants/uid-separator";
 
 export function getMatchedKeys(params: {
    source: Map<string, any>;
-   uniqueIdentifier?: string;
    url: string;
    options?: RemoveQueryOptions;
    paramsObjectOverwrites: boolean;
    removeNullValues: boolean;
 }) {
-   const {
-      source,
-      uniqueIdentifier: uid,
-      url,
-      options,
-      paramsObjectOverwrites,
-      removeNullValues,
-   } = params;
+   const {source, url, options, paramsObjectOverwrites, removeNullValues} = params;
+   const uid = options?.uniqueIdentifier;
 
    const sourceObject = mapToObject(source);
    const rearrangedUrl = rearrangeUrl({
