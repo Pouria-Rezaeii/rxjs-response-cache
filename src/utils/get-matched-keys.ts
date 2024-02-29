@@ -6,7 +6,7 @@ import {uidSeparator} from "../constants/uid-separator";
 export function getMatchedKeys(params: {
    source: Map<string, any>;
    url: string;
-   options?: RemoveQueryOptions;
+   options?: Omit<RemoveQueryOptions, "queryParams">;
    paramsObjectOverwrites: boolean;
    removeNullValues: boolean;
 }) {
@@ -16,7 +16,7 @@ export function getMatchedKeys(params: {
    const sourceObject = mapToObject(source);
    const rearrangedUrl = rearrangeUrl({
       url,
-      params: options?.queryParams,
+      params: options?.params,
       paramsObjectOverwrites,
       removeNullValues,
    });

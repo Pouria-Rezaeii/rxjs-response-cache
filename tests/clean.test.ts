@@ -88,7 +88,8 @@ describe("Cache service clean method", () => {
          })
       );
 
-      cacheService.remove(postsUrl, {queryParams: {a: "T"}});
+      // let be the deprecated property
+      cacheService.remove(postsUrl, {params: {a: "T"}});
 
       expect(cacheService.data).toEqual({});
    });
@@ -125,7 +126,7 @@ describe("Cache service clean method", () => {
             observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
          })
       );
-      cacheService.remove(postsUrl, {exact: true, queryParams: {a: "T"}});
+      cacheService.remove(postsUrl, {exact: true, params: {a: "T"}});
 
       expect(cacheService.data[postsUrl]).toBeTruthy();
       expect(cacheService.data[postsUrl.concat("?a=T")]).toBeFalsy();
@@ -165,7 +166,7 @@ describe("Cache service clean method", () => {
          })
       );
 
-      cacheService.remove(postsUrl, {queryParams: {a: "T"}});
+      cacheService.remove(postsUrl, {params: {a: "T"}});
       expect(cacheService.data).toEqual({});
    });
 });

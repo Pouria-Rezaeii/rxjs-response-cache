@@ -267,7 +267,8 @@ export class ResponseCache {
       const matches = getMatchedKeys({
          source: this._cachedData,
          url,
-         options: options,
+         // this is because options.queryParams is depricated
+         options: {...options, params: options?.params || options?.queryParams},
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
          removeNullValues: this._config.removeNullValues!,
       });
