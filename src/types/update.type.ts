@@ -7,6 +7,10 @@ export type KeySelector = {
    url: string;
    exact?: boolean;
    params?: QueryParams;
+   // todo: find a better name
+   pathToContainingList?: string;
+   // todo: add generic type
+   resolver?: (params: {oldData: any; updatedEntity: any}) => any;
 };
 
 export type UpdateParams<T> = {
@@ -14,10 +18,8 @@ export type UpdateParams<T> = {
    url: string;
    params?: QueryParams;
    data: T | UpdateCallback<T>;
-   // updateRelatedKeys?: {
-   //    entityUniqueField: {
-   //       [key: string]: string | number;
-   //    };
-   //    keysSelector: KeySelector | KeySelector[];
-   // };
+   updateRelatedKeys?: {
+      entityUniqueField: string;
+      keysSelector: KeySelector;
+   };
 };

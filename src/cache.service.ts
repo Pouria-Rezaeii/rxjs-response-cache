@@ -17,6 +17,7 @@ import {
 import {defaults} from "./defaults";
 import {mapToObject} from "./utils/map-to-object";
 import {uidSeparator} from "./constants/uid-separator";
+import {isObject} from "./utils/is-object";
 
 /**
  * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#beginning}}
@@ -34,6 +35,7 @@ export class ResponseCache {
    private _cachedData = new Map<string, any>();
    private _clearTimeouts = new Map<string, number>();
    private _observables = new Map<string, ObservableConfig<any>["observable"]>();
+   private _errorPrefix = "RxJS Response Cache Development Error: ";
 
    /**
     * @description Global caching service for RxJS GET responses.
@@ -101,6 +103,36 @@ export class ResponseCache {
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
          removeNullValues: this._config.removeNullValues!,
       });
+   }
+
+   private _setClearTimeout(key: string, timeout: number, data: any) {
+      const oldTimeoutId = this._clearTimeouts.get(key);
+      if (oldTimeoutId) {
+         // deleting the old one
+         clearTimeout(oldTimeoutId);
+         this._isDev && removeTimeoutFromLocalStorage(oldTimeoutId);
+      }
+
+      const timeoutId = setTimeout(() => {
+         // check if data is not already removed by resetting the cache
+         // (to prevent the redundant devtool message)
+         if (this._cachedData.has(key)) {
+            this._cachedData.delete(key);
+            this._observables.delete(key);
+            this._clearTimeouts.delete(key);
+            this._isDev && removeTimeoutFromLocalStorage(timeoutId as unknown as number);
+            this._showDevtool && this._updateDevtool(key, "🗑 Removed by timeout", data);
+         }
+      }, timeout);
+      // setting a new one
+      this._clearTimeouts.set(key, timeoutId as unknown as number);
+      this._isDev && addTimeoutToLocalStorage(timeoutId as unknown as number);
+   }
+
+   private _getRemovalTimeoutMessage(timeout: number) {
+      const date = new Date();
+      date.setMilliseconds(date.getMilliseconds() + timeout);
+      return `; 🕓 Removal timeout set for ${date.toLocaleTimeString()}`;
    }
 
    /**
@@ -215,36 +247,6 @@ export class ResponseCache {
       });
    }
 
-   private _setClearTimeout(key: string, timeout: number, data: any) {
-      const oldTimeoutId = this._clearTimeouts.get(key);
-      if (oldTimeoutId) {
-         // deleting the old one
-         clearTimeout(oldTimeoutId);
-         this._isDev && removeTimeoutFromLocalStorage(oldTimeoutId);
-      }
-
-      const timeoutId = setTimeout(() => {
-         // check if data is not already removed by resetting the cache
-         // (to prevent the redundant devtool message)
-         if (this._cachedData.has(key)) {
-            this._cachedData.delete(key);
-            this._observables.delete(key);
-            this._clearTimeouts.delete(key);
-            this._isDev && removeTimeoutFromLocalStorage(timeoutId as unknown as number);
-            this._showDevtool && this._updateDevtool(key, "🗑 Removed by timeout", data);
-         }
-      }, timeout);
-      // setting a new one
-      this._clearTimeouts.set(key, timeoutId as unknown as number);
-      this._isDev && addTimeoutToLocalStorage(timeoutId as unknown as number);
-   }
-
-   private _getRemovalTimeoutMessage(timeout: number) {
-      const date = new Date();
-      date.setMilliseconds(date.getMilliseconds() + timeout);
-      return `; 🕓 Removal timeout set for ${date.toLocaleTimeString()}`;
-   }
-
    /**
     * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#clean}
     *
@@ -267,7 +269,7 @@ export class ResponseCache {
       const matches = getMatchedKeys({
          source: this._cachedData,
          url,
-         // this is because options.queryParams is depricated
+         // this is because options.queryParams is deprecated
          options: {...options, params: options?.params || options?.queryParams},
          paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
          removeNullValues: this._config.removeNullValues!,
@@ -295,7 +297,7 @@ export class ResponseCache {
          this._showDevtool &&
             this._updateDevtool(key, messageText, {key: this._cachedData.get(key)});
          if (this._isDev) {
-            throw new Error("RxJS Response Cache Development Error: " + messageText);
+            throw new Error(this._errorPrefix + messageText);
          }
          return;
       }
@@ -310,9 +312,9 @@ export class ResponseCache {
       }
    }
 
-   public update<T>(params: UpdateParams<T>): void {
-      const {uniqueIdentifier: uid, url: _rawUrl, data: _data} = params;
-      const url = this._rearrangeUrl({url: _rawUrl, params: params.params});
+   public update<T>(input: UpdateParams<T>): void {
+      const {uniqueIdentifier: uid, url: _rawUrl, data: _data, params, updateRelatedKeys} = input;
+      const url = this._rearrangeUrl({url: _rawUrl, params: params});
       const key = uid ? uid + uidSeparator + url : url;
       // todo: handle clearTimeout in next minor version (I should save the previous timeout value in order to using it here)
 
@@ -320,22 +322,135 @@ export class ResponseCache {
          const messageText = "⛔ You intended to update a key which is not present in the cache.";
          this._showDevtool && this._updateDevtool(key, messageText, {key: undefined});
          if (this._isDev) {
-            throw new Error("RxJS Response Cache Development Error: " + messageText);
+            throw new Error(this._errorPrefix + messageText);
          }
          return;
       }
 
-      const data =
+      const newValue =
          typeof _data === "function"
             ? (_data as UpdateCallback<T>)(this._cachedData.get(key))
             : _data;
 
-      this._cachedData.set(key, data);
+      const oldValue = this._cachedData.get(key);
+      this._cachedData.set(key, newValue);
 
       // DEVTOOL UPDATE
       if (this._showDevtool) {
          const messageText = "✎ data updated";
-         this._updateDevtool(key, messageText, data);
+         this._updateDevtool(key, messageText, {oldValue, newValue});
+      }
+
+      // =========================  UPDATING RELATED KEYS
+
+      if (updateRelatedKeys) {
+         const {entityUniqueField: uniqueKey, keysSelector} = updateRelatedKeys;
+
+         if (!isObject(newValue)) {
+            const messageText =
+               "updateRelatedKeys is only available if the provided data constructor is Object. Check the docs for more info.";
+            if (this._isDev) {
+               throw new Error(this._errorPrefix + messageText);
+            }
+            if (this._showDevtool) {
+               this._updateDevtool(key, messageText, newValue);
+            }
+            return;
+         }
+
+         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+         // @ts-ignore
+         if (!Object.hasOwn(newValue, uniqueKey)) {
+            const messageText = `The provided data does not include the provided entityUniqueField (${uniqueKey}). Check the docs for more info.`;
+            if (this._isDev) {
+               throw new Error(this._errorPrefix + messageText);
+            }
+            if (this._showDevtool) {
+               this._updateDevtool(key, messageText, newValue);
+            }
+            return;
+         }
+
+         // todo: add Array scenario
+
+         const {pathToContainingList: path, resolver, url: selectorUrl, ...options} = keysSelector;
+         const matches = getMatchedKeys({
+            source: this._cachedData,
+            url: selectorUrl,
+            options: options,
+            paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
+            removeNullValues: this._config.removeNullValues!,
+         })
+            // filtering the original one
+            .filter((k) => k !== key);
+
+         matches.forEach((key) => {
+            const staleData = this._cachedData.get(key);
+            if (path) {
+               if (!Array.isArray(staleData[path])) {
+                  // todo: add try catch
+                  // todo: find a better message message
+                  const messageText = `updateRelatedKeys only iterates on arrays. Check the docs for more info.`;
+                  if (this._isDev) {
+                     throw new Error(this._errorPrefix + messageText);
+                  }
+                  if (this._showDevtool) {
+                     this._updateDevtool(key, messageText, {key: staleData});
+                  }
+                  return;
+               }
+               const refreshData = {
+                  ...staleData,
+                  [path]: (staleData[path] as any[]).map((entity: any) => {
+                     return entity[uniqueKey] === (newValue as any)[uniqueKey] ? newValue : entity;
+                  }),
+               };
+               this._cachedData.set(key, refreshData);
+
+               if (this._showDevtool) {
+                  this._updateDevtool(key, "✎ Matched and updated", {
+                     oldValue: staleData,
+                     newValue: refreshData,
+                  });
+               }
+            } else if (resolver) {
+               // todo: handle errors
+               matches.forEach((key) => {
+                  const staleData = this._cachedData.get(key);
+                  const refreshData = resolver({oldData: staleData, updatedEntity: newValue});
+                  this._cachedData.set(key, refreshData);
+                  // todo: batch update messages for update and remove
+                  if (this._showDevtool) {
+                     this._updateDevtool(key, "✎ Matched and updated", {
+                        oldValue: staleData,
+                        newValue: refreshData,
+                     });
+                  }
+               });
+            } else {
+               if (!Array.isArray(staleData)) {
+                  const messageText = `updateRelatedKeys only iterates on arrays. Check the docs for more info.`;
+                  if (this._isDev) {
+                     throw new Error(this._errorPrefix + messageText);
+                  }
+                  if (this._showDevtool) {
+                     this._updateDevtool(key, messageText, {key: staleData});
+                  }
+                  return;
+               }
+               const refreshData = (staleData as any[]).map((entity: any) => {
+                  return entity[uniqueKey] === (newValue as any)[uniqueKey] ? newValue : entity;
+               });
+               this._cachedData.set(key, refreshData);
+
+               if (this._showDevtool) {
+                  this._updateDevtool(key, "✎ Matched and updated", {
+                     oldValue: staleData,
+                     newValue: refreshData,
+                  });
+               }
+            }
+         });
       }
    }
 

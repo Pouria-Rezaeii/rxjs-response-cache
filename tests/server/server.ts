@@ -10,10 +10,12 @@ export function mockServer(url: string, throwError?: boolean) {
          if (throwError) {
             observer.error(internalServerErrorException);
             // posts
+         } else if (url === "/posts-with-pagination") {
+            observer.next({page: 1, results: [...posts]});
+            observer.complete();
          } else if (url === "/posts" || url.startsWith("/posts?")) {
             observer.next([...posts]);
             observer.complete();
-            // posts/:id
          } else if (url.startsWith("/posts/")) {
             const id = url.split("/")[2];
             const post = posts.find((p) => p.id.toString() === id);

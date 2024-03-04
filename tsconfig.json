@@ -1,7 +1,7 @@
 {
    "compilerOptions": {
       "allowSyntheticDefaultImports": true,
-      "module": "es2020",
+      "module": "es2022",
       "target": "es6",
       "rootDir": "./",
       "outDir": "./dist",
