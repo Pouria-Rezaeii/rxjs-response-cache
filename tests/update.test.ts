@@ -99,7 +99,7 @@ describe("Cache Service Update Method", () => {
             entityUniqueField: "id",
             keysSelector: {
                url: postsWithPaginationUrl,
-               pathToContainingList: "results",
+               arrayFieldName: "results",
             },
          },
       });

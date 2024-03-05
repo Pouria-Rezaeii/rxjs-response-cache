@@ -18,6 +18,7 @@ import {defaults} from "./defaults";
 import {mapToObject} from "./utils/map-to-object";
 import {uidSeparator} from "./constants/uid-separator";
 import {isObject} from "./utils/is-object";
+import {deepEqual} from "./utils/deep-equal";
 
 /**
  * @tutorial {@link https://github.com/Pouria-Rezaeii/rxjs-response-cache?tab=readme-ov-file#beginning}}
@@ -344,113 +345,147 @@ export class ResponseCache {
       // =========================  UPDATING RELATED KEYS
 
       if (updateRelatedKeys) {
-         const {entityUniqueField: uniqueKey, keysSelector} = updateRelatedKeys;
+         try {
+            const {entityUniqueField: uniqueKey, keysSelector} = updateRelatedKeys;
 
-         if (!isObject(newValue)) {
-            const messageText =
-               "updateRelatedKeys is only available if the provided data constructor is Object. Check the docs for more info.";
-            if (this._isDev) {
-               throw new Error(this._errorPrefix + messageText);
-            }
-            if (this._showDevtool) {
-               this._updateDevtool(key, messageText, newValue);
-            }
-            return;
-         }
-
-         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-         // @ts-ignore
-         if (!Object.hasOwn(newValue, uniqueKey)) {
-            const messageText = `The provided data does not include the provided entityUniqueField (${uniqueKey}). Check the docs for more info.`;
-            if (this._isDev) {
-               throw new Error(this._errorPrefix + messageText);
-            }
-            if (this._showDevtool) {
-               this._updateDevtool(key, messageText, newValue);
-            }
-            return;
-         }
-
-         // todo: add Array scenario
-
-         const {pathToContainingList: path, resolver, url: selectorUrl, ...options} = keysSelector;
-         const matches = getMatchedKeys({
-            source: this._cachedData,
-            url: selectorUrl,
-            options: options,
-            paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
-            removeNullValues: this._config.removeNullValues!,
-         })
-            // filtering the original one
-            .filter((k) => k !== key);
-
-         matches.forEach((key) => {
-            const staleData = this._cachedData.get(key);
-            if (path) {
-               if (!Array.isArray(staleData[path])) {
-                  // todo: add try catch
-                  // todo: find a better message message
-                  const messageText = `updateRelatedKeys only iterates on arrays. Check the docs for more info.`;
-                  if (this._isDev) {
-                     throw new Error(this._errorPrefix + messageText);
-                  }
-                  if (this._showDevtool) {
-                     this._updateDevtool(key, messageText, {key: staleData});
-                  }
-                  return;
+            if (!isObject(newValue)) {
+               const messageText =
+                  "updateRelatedKeys is only available if the provided data constructor is Object. Check the docs for more info.";
+               if (this._isDev) {
+                  throw new Error(this._errorPrefix + messageText);
                }
-               const refreshData = {
-                  ...staleData,
-                  [path]: (staleData[path] as any[]).map((entity: any) => {
-                     return entity[uniqueKey] === (newValue as any)[uniqueKey] ? newValue : entity;
-                  }),
-               };
-               this._cachedData.set(key, refreshData);
-
                if (this._showDevtool) {
-                  this._updateDevtool(key, "✎ Matched and updated", {
-                     oldValue: staleData,
-                     newValue: refreshData,
-                  });
+                  this._updateDevtool(key, messageText, newValue);
                }
-            } else if (resolver) {
-               // todo: handle errors
+               return;
+            }
+
+            if (!Object.hasOwn(newValue as object, uniqueKey)) {
+               const messageText = `The provided data does not include the provided entityUniqueField (${uniqueKey}). Check the docs for more info.`;
+               if (this._isDev) {
+                  throw new Error(this._errorPrefix + messageText);
+               }
+               if (this._showDevtool) {
+                  this._updateDevtool(key, messageText, newValue);
+               }
+               return;
+            }
+
+            // todo: add Array scenario
+
+            const {arrayFieldName: path, resolver, url: selectorUrl, ...options} = keysSelector;
+            const matches = getMatchedKeys({
+               source: this._cachedData,
+               url: selectorUrl,
+               options: options,
+               paramsObjectOverwrites: this._config.paramsObjectOverwritesUrlQueries!,
+               removeNullValues: this._config.removeNullValues!,
+            })
+               // filtering the original one
+               .filter((k) => k !== key);
+
+            if (path) {
                matches.forEach((key) => {
                   const staleData = this._cachedData.get(key);
-                  const refreshData = resolver({oldData: staleData, updatedEntity: newValue});
-                  this._cachedData.set(key, refreshData);
-                  // todo: batch update messages for update and remove
-                  if (this._showDevtool) {
-                     this._updateDevtool(key, "✎ Matched and updated", {
-                        oldValue: staleData,
-                        newValue: refreshData,
-                     });
+                  if (!Array.isArray(staleData[path])) {
+                     const messageText = `updateRelatedKeys only iterates on arrays. But, data[${path}] does not resolve to an array field. Check the docs for more info.`;
+                     if (this._isDev) {
+                        throw new Error(this._errorPrefix + messageText);
+                     }
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, messageText, {
+                           providedPath: path,
+                           data: staleData,
+                        });
+                     }
+                     return;
+                  }
+                  const freshData = {
+                     ...staleData,
+                     [path]: (staleData[path] as any[]).map((entity: any) => {
+                        return entity[uniqueKey] === (newValue as any)[uniqueKey]
+                           ? newValue
+                           : entity;
+                     }),
+                  };
+
+                  if (deepEqual(staleData, freshData)) {
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, "x Matched but NOT updated", {
+                           oldValue: staleData,
+                           newValue: freshData,
+                        });
+                     }
+                  } else {
+                     this._cachedData.set(key, freshData);
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, "✎ Matched and updated", {
+                           oldValue: staleData,
+                           newValue: freshData,
+                        });
+                     }
+                  }
+               });
+            } else if (resolver) {
+               matches.forEach((key) => {
+                  const staleData = this._cachedData.get(key);
+                  const freshData = resolver({oldData: staleData, updatedEntity: newValue});
+
+                  if (deepEqual(staleData, freshData)) {
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, "x Matched but NOT updated", {
+                           oldValue: staleData,
+                           newValue: freshData,
+                        });
+                     }
+                  } else {
+                     this._cachedData.set(key, freshData);
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, "✎ Matched and updated", {
+                           oldValue: staleData,
+                           newValue: freshData,
+                        });
+                     }
                   }
                });
             } else {
-               if (!Array.isArray(staleData)) {
-                  const messageText = `updateRelatedKeys only iterates on arrays. Check the docs for more info.`;
-                  if (this._isDev) {
-                     throw new Error(this._errorPrefix + messageText);
+               matches.forEach((key) => {
+                  const staleData = this._cachedData.get(key);
+                  if (!Array.isArray(staleData)) {
+                     const messageText = `updateRelatedKeys only iterates on arrays. Check the docs for more info.`;
+                     if (this._isDev) {
+                        throw new Error(this._errorPrefix + messageText);
+                     }
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, messageText, {key: staleData});
+                     }
+                     return;
                   }
-                  if (this._showDevtool) {
-                     this._updateDevtool(key, messageText, {key: staleData});
-                  }
-                  return;
-               }
-               const refreshData = (staleData as any[]).map((entity: any) => {
-                  return entity[uniqueKey] === (newValue as any)[uniqueKey] ? newValue : entity;
-               });
-               this._cachedData.set(key, refreshData);
-
-               if (this._showDevtool) {
-                  this._updateDevtool(key, "✎ Matched and updated", {
-                     oldValue: staleData,
-                     newValue: refreshData,
+                  const freshData = (staleData as any[]).map((entity: any) => {
+                     return entity[uniqueKey] === (newValue as any)[uniqueKey] ? newValue : entity;
                   });
-               }
+
+                  if (deepEqual(staleData, freshData)) {
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, "x Matched but NOT updated", {
+                           oldValue: staleData,
+                           newValue: freshData,
+                        });
+                     }
+                  } else {
+                     this._cachedData.set(key, freshData);
+                     if (this._showDevtool) {
+                        this._updateDevtool(key, "✎ Matched and updated", {
+                           oldValue: staleData,
+                           newValue: freshData,
+                        });
+                     }
+                  }
+               });
             }
-         });
+         } catch (error) {
+            this._isDev && console.log(error);
+         }
       }
    }
 
