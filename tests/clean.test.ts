@@ -1,172 +1,93 @@
-import {lastValueFrom} from "rxjs";
 import {ResponseCache as Cache} from "../src/index";
-import {observableFunction} from "./utils/observable-function";
 import {postsUrl} from "./server/urls";
 import {posts} from "./server/posts";
 import {uidSeparator} from "../src/constants/uid-separator";
+import {getLastFactory} from "./utils/custom-get";
 
 describe("Cache service clean method", () => {
-   let cacheService: Cache;
+   let cache: Cache;
+   let getLast: ReturnType<typeof getLastFactory>;
 
    beforeEach(() => {
-      cacheService = new Cache({
-         isDevMode: false,
-      });
+      cache = new Cache({isDevMode: false});
+      getLast = getLastFactory(cache);
    });
 
    it("Clears data, observable and clear timeout correctly if is NOT provided uid in clean options", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl});
 
-      await lastValueFrom(
-         cacheService.get({
-            uniqueIdentifier: "some_uid",
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            clearTimeout: 500,
-         })
-      );
+      await getLast({uniqueIdentifier: "some_uid", url: postsUrl, clearTimeout: 500});
 
       // let it be like this to test the deprecated version
-      cacheService.clean(postsUrl);
+      cache.clean(postsUrl);
 
       const expectedKey = "some_uid" + uidSeparator + postsUrl;
-      expect(cacheService.data).toEqual({
-         [expectedKey]: posts,
-      });
-      expect(cacheService.observables[expectedKey]).toBeTruthy();
-      expect(cacheService.clearTimeouts[expectedKey]).toBeTruthy();
+      expect(cache.data).toEqual({[expectedKey]: posts});
+      expect(cache.observables[expectedKey]).toBeTruthy();
+      expect(cache.clearTimeouts[expectedKey]).toBeTruthy();
    });
 
    it("Clears data, observable and clear timeout correctly if uid IS provided in clean options", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            clearTimeout: 500,
-         })
-      );
+      await getLast({url: postsUrl, clearTimeout: 500});
 
-      await lastValueFrom(
-         cacheService.get({
-            uniqueIdentifier: "some_uid",
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({uniqueIdentifier: "some_uid", url: postsUrl});
 
-      cacheService.remove(postsUrl, {uniqueIdentifier: "some_uid"});
+      cache.remove(postsUrl, {uniqueIdentifier: "some_uid"});
 
-      expect(cacheService.data).toEqual({
-         [postsUrl]: posts,
-      });
-      expect(cacheService.observables[postsUrl]).toBeTruthy();
-      expect(cacheService.clearTimeouts[postsUrl]).toBeTruthy();
+      expect(cache.data).toEqual({[postsUrl]: posts});
+      expect(cache.observables[postsUrl]).toBeTruthy();
+      expect(cache.clearTimeouts[postsUrl]).toBeTruthy();
    });
 
    it("Accepts params in url ", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl.concat("?a=T"),
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl.concat("?a=T")});
 
-      cacheService.remove(postsUrl.concat("?a=T"));
-      expect(cacheService.data).toEqual({});
+      cache.remove(postsUrl.concat("?a=T"));
+      expect(cache.data).toEqual({});
    });
 
    it("Accepts params in queryParams object", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl.concat("?a=T"),
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl.concat("?a=T")});
 
       // let be the deprecated property
-      cacheService.remove(postsUrl, {params: {a: "T"}});
+      cache.remove(postsUrl, {params: {a: "T"}});
 
-      expect(cacheService.data).toEqual({});
+      expect(cache.data).toEqual({});
    });
 
    it("Matches only one key if `exact=true` and query params are included in `url` parameter", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl.concat("?a=T"),
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
-      cacheService.remove(postsUrl, {exact: true});
+      await getLast({url: postsUrl});
+      await getLast({url: postsUrl.concat("?a=T")});
+      cache.remove(postsUrl, {exact: true});
 
-      expect(cacheService.data[postsUrl]).toBeFalsy();
-      expect(cacheService.data[postsUrl.concat("?a=T")]).toBeTruthy();
+      expect(cache.data[postsUrl]).toBeFalsy();
+      expect(cache.data[postsUrl.concat("?a=T")]).toBeTruthy();
    });
 
    it("Matches only one key if `exact=true` and query params are included in `query param` parameter", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
-      cacheService.remove(postsUrl, {exact: true, params: {a: "T"}});
+      await getLast({url: postsUrl});
+      await getLast({url: postsUrl});
+      cache.remove(postsUrl, {exact: true, params: {a: "T"}});
 
-      expect(cacheService.data[postsUrl]).toBeTruthy();
-      expect(cacheService.data[postsUrl.concat("?a=T")]).toBeFalsy();
+      expect(cache.data[postsUrl]).toBeTruthy();
+      expect(cache.data[postsUrl.concat("?a=T")]).toBeFalsy();
    });
 
    it("Matches as many as possible if `exact=false` and query params are included in `url` parameter", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl.concat("?a=T"),
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl.concat("?a=T")});
 
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl.concat("?a=T&b=T"),
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl.concat("?a=T&b=T")});
 
-      cacheService.remove(postsUrl.concat("?a=T"));
-      expect(cacheService.data).toEqual({});
+      cache.remove(postsUrl.concat("?a=T"));
+      expect(cache.data).toEqual({});
    });
 
    it("Matches as many as possible if `exact=false` and query params are included in `query param` parameter", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl.concat("?a=T"),
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl.concat("?a=T")});
 
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl.concat("?a=T&b=T"),
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl.concat("?a=T&b=T")});
 
-      cacheService.remove(postsUrl, {params: {a: "T"}});
-      expect(cacheService.data).toEqual({});
+      cache.remove(postsUrl, {params: {a: "T"}});
+      expect(cache.data).toEqual({});
    });
 });

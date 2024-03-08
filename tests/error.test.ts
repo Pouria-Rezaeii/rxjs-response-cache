@@ -1,57 +1,38 @@
 import {ResponseCache as Cache} from "../src/index";
-import {firstValueFrom, lastValueFrom} from "rxjs";
 import {observableFunction} from "./utils/observable-function";
 import {notFoundException, internalServerErrorException} from "./server/errors";
 import {resetCounterUrl, currentCounterUrl} from "./server/urls";
+import {getFirstFactory, getLastFactory} from "./utils/custom-get";
 
 describe("Cache service error handling", () => {
    let cache: Cache;
+   let getFirst: ReturnType<typeof getFirstFactory>;
+   let getLast: ReturnType<typeof getLastFactory>;
 
-   beforeEach(async () => {
+   beforeEach(() => {
       observableFunction(resetCounterUrl).subscribe();
-      cache = new Cache({
-         isDevMode: false,
-      });
+      cache = new Cache({isDevMode: false});
+      getFirst = getFirstFactory(cache);
+      getLast = getLastFactory(cache);
    });
 
    it("Throws the error correctly if request fails.", async () => {
       try {
-         await firstValueFrom(
-            cache.get({
-               url: "/not-exist-rul",
-               observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            })
-         );
+         await getFirst({url: "/not-exist-rul"});
       } catch (error) {
          expect(error).toEqual(notFoundException);
       }
    });
 
    it("Returns the cached date and throws the error correctly if refresh request fails.", async () => {
-      await firstValueFrom(
-         cache.get({
-            url: currentCounterUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getFirst({url: currentCounterUrl});
 
-      const anotherCallFirstResponse = await firstValueFrom(
-         cache.get({
-            url: currentCounterUrl,
-            refresh: true,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl, {throwError: true}),
-         })
-      );
+      const anotherCallFirstResponse = await getFirst({url: currentCounterUrl, refresh: true});
+
       expect(anotherCallFirstResponse).toEqual({counter: 1});
 
       try {
-         await lastValueFrom(
-            cache.get({
-               url: currentCounterUrl,
-               refresh: true,
-               observable: ({arrangedUrl}) => observableFunction(arrangedUrl, {throwError: true}),
-            })
-         );
+         await getLast({url: currentCounterUrl, refresh: true});
       } catch (error) {
          expect(error).toEqual(internalServerErrorException);
       }

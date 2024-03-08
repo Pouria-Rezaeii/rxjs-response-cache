@@ -1,58 +1,56 @@
-import {ResponseCache} from "../src/index";
-import {lastValueFrom} from "rxjs";
+import {ResponseCache as Cache} from "../src/index";
 import {firstPostUrl, postsUrl, postsWithPaginationUrl} from "./server/urls";
-import {observableFunction} from "./utils/observable-function";
 import {posts} from "./server/posts";
-import {QueryParams} from "../src/types/index.type";
-
-let cacheService: ResponseCache;
+import {getLastFactory} from "./utils/custom-get";
 
 describe("Cache Service Update Method", () => {
+   let cache: Cache;
+   let getLast: ReturnType<typeof getLastFactory>;
+
    beforeEach(() => {
-      cacheService = new ResponseCache({
-         isDevMode: false,
-      });
+      cache = new Cache({isDevMode: false});
+      getLast = getLastFactory(cache);
    });
 
    it("Replace individual key correctly.", async () => {
-      await customFetch(firstPostUrl);
+      await getLast({url: firstPostUrl});
 
-      cacheService.update({
+      cache.update({
          url: firstPostUrl,
          data: {test: "test"},
       });
-      expect(cacheService.data[firstPostUrl]).toEqual({test: "test"});
+      expect(cache.data[firstPostUrl]).toEqual({test: "test"});
    });
 
    it("Passes the old data correctly.", async () => {
-      await customFetch(firstPostUrl);
+      await getLast({url: firstPostUrl});
 
-      cacheService.update<(typeof posts)[0]>({
+      cache.update<(typeof posts)[0]>({
          url: firstPostUrl,
          data: (oldData) => ({...oldData, test: "test"}),
       });
-      expect(cacheService.data[firstPostUrl]).toEqual({...posts[0], test: "test"});
+      expect(cache.data[firstPostUrl]).toEqual({...posts[0], test: "test"});
    });
 
    it("Does not insert the data if key is not present in the cache.", async () => {
-      cacheService.update({
+      cache.update({
          url: firstPostUrl,
          data: {test: "test"},
       });
-      expect(cacheService.data[firstPostUrl]).toEqual(undefined);
+      expect(cache.data[firstPostUrl]).toEqual(undefined);
    });
 
    it("Updates the related key correctly if `exact=false`", async () => {
-      await customFetch(firstPostUrl);
-      await customFetch(postsUrl);
-      await customFetch(postsUrl, {active: true});
+      await getLast({url: firstPostUrl});
+      await getLast({url: postsUrl});
+      await getLast({url: postsUrl, params: {active: true}});
 
-      expect(cacheService.data[firstPostUrl]).toEqual(posts[0]);
-      expect(cacheService.data[postsUrl]).toEqual(posts);
+      expect(cache.data[firstPostUrl]).toEqual(posts[0]);
+      expect(cache.data[postsUrl]).toEqual(posts);
 
       const newData = {id: 1, testKey: "this data is new."};
 
-      cacheService.update({
+      cache.update({
          url: firstPostUrl,
          data: newData,
          updateRelatedKeys: {
@@ -61,19 +59,19 @@ describe("Cache Service Update Method", () => {
          },
       });
 
-      expect(cacheService.data[firstPostUrl]).toEqual(newData);
-      expect(cacheService.data[postsUrl][0]).toEqual(newData);
-      expect(cacheService.data[postsUrl.concat("?active=true")][0]).toEqual(newData);
+      expect(cache.data[firstPostUrl]).toEqual(newData);
+      expect(cache.data[postsUrl][0]).toEqual(newData);
+      expect(cache.data[postsUrl.concat("?active=true")][0]).toEqual(newData);
    });
 
    it("Updates the related key correctly if `exact=true`", async () => {
-      await customFetch(firstPostUrl);
-      await customFetch(postsUrl);
-      await customFetch(postsUrl, {active: true});
+      await getLast({url: firstPostUrl});
+      await getLast({url: postsUrl});
+      await getLast({url: postsUrl, params: {active: true}});
 
       const newData = {id: 1, testKey: "this data is new."};
 
-      cacheService.update({
+      cache.update({
          url: firstPostUrl,
          data: newData,
          updateRelatedKeys: {
@@ -82,17 +80,17 @@ describe("Cache Service Update Method", () => {
          },
       });
 
-      expect(cacheService.data[postsUrl][0]).toEqual(newData);
-      expect(cacheService.data[postsUrl.concat("?active=true")][0]).not.toEqual(newData);
+      expect(cache.data[postsUrl][0]).toEqual(newData);
+      expect(cache.data[postsUrl.concat("?active=true")][0]).not.toEqual(newData);
    });
 
    it("Accepts the `pathToContainingField` param.", async () => {
-      await customFetch(firstPostUrl);
-      await customFetch(postsWithPaginationUrl);
+      await getLast({url: firstPostUrl});
+      await getLast({url: postsWithPaginationUrl});
 
       const newData = {id: 1, testKey: "this data is new."};
 
-      cacheService.update({
+      cache.update({
          url: firstPostUrl,
          data: newData,
          updateRelatedKeys: {
@@ -104,16 +102,16 @@ describe("Cache Service Update Method", () => {
          },
       });
 
-      expect(cacheService.data[postsWithPaginationUrl]["results"][0]).toEqual(newData);
+      expect(cache.data[postsWithPaginationUrl]["results"][0]).toEqual(newData);
    });
 
    it("Accepts the `updateHandler` param.", async () => {
-      await customFetch(firstPostUrl);
-      await customFetch(postsWithPaginationUrl);
+      await getLast({url: firstPostUrl});
+      await getLast({url: postsWithPaginationUrl});
 
       const newData = {id: 1, testKey: "this data is new."};
 
-      cacheService.update({
+      cache.update({
          url: firstPostUrl,
          data: newData,
          updateRelatedKeys: {
@@ -132,16 +130,6 @@ describe("Cache Service Update Method", () => {
          },
       });
 
-      expect(cacheService.data[postsWithPaginationUrl]["results"][0]).toEqual(newData);
+      expect(cache.data[postsWithPaginationUrl]["results"][0]).toEqual(newData);
    });
 });
-
-function customFetch(url: string, params?: QueryParams) {
-   return lastValueFrom(
-      cacheService.get({
-         url,
-         params,
-         observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-      })
-   );
-}

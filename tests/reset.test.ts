@@ -1,32 +1,26 @@
-import {lastValueFrom} from "rxjs";
 import {CacheService} from "../src/index";
 import {postsUrl} from "./server/urls";
-import {observableFunction} from "./utils/observable-function";
+import {getLastFactory} from "./utils/custom-get";
 
 describe("Cache service initialization", () => {
    // let be the deprecated version to be tested
-   let cacheService: CacheService;
+   let cache: CacheService;
+   let getLast: ReturnType<typeof getLastFactory>;
 
    beforeEach(() => {
-      cacheService = new CacheService({
-         isDevMode: false,
-      });
+      cache = new CacheService({isDevMode: false});
+      getLast = getLastFactory(cache);
    });
 
    it("Resets the cache correctly.", async () => {
-      await lastValueFrom(
-         cacheService.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
+      await getLast({url: postsUrl});
 
       // let be the deprecated version to be tested
-      cacheService.resetCache();
+      cache.resetCache();
 
       // let be the deprecated version to be tested
-      expect(cacheService.cachedData).toEqual({});
-      expect(cacheService.observables).toEqual({});
-      expect(cacheService.clearTimeouts).toEqual({});
+      expect(cache.cachedData).toEqual({});
+      expect(cache.observables).toEqual({});
+      expect(cache.clearTimeouts).toEqual({});
    });
 });

@@ -1,33 +1,21 @@
 import {ResponseCache as Cache} from "../src/index";
-import {lastValueFrom} from "rxjs";
 import {observableFunction} from "./utils/observable-function";
 import {resetCounterUrl, postsUrl} from "./server/urls";
+import {getLastFactory} from "./utils/custom-get";
 
 describe("Subscriber.next() trigger behaviour", () => {
    let cache: Cache;
+   let getLast: ReturnType<typeof getLastFactory>;
 
-   beforeEach(async () => {
+   beforeEach(() => {
       observableFunction(resetCounterUrl).subscribe();
-      cache = new Cache({
-         isDevMode: false,
-      });
+      cache = new Cache({isDevMode: false});
+      getLast = getLastFactory(cache);
    });
 
    it("Does not call the second .next() if data is equal to the cached version (by default).", async () => {
-      const res = await lastValueFrom(
-         cache.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
-
-      const res2 = await lastValueFrom(
-         cache.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            refresh: true,
-         })
-      );
+      const res = await getLast({url: postsUrl});
+      const res2 = await getLast({url: postsUrl, refresh: true});
 
       // reference check equality
       expect(res).toBe(res2);
@@ -38,21 +26,10 @@ describe("Subscriber.next() trigger behaviour", () => {
          isDevMode: false,
          preventSecondCallIfDataIsUnchanged: false,
       });
+      getLast = getLastFactory(cache);
 
-      const res = await lastValueFrom(
-         cache.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-         })
-      );
-
-      const res2 = await lastValueFrom(
-         cache.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            refresh: true,
-         })
-      );
+      const res = await getLast({url: postsUrl});
+      const res2 = await getLast({url: postsUrl, refresh: true});
 
       // reference check equality
       expect(res).not.toBe(res2);

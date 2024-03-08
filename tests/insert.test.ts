@@ -1,13 +1,11 @@
-import {ResponseCache} from "../src/index";
+import {ResponseCache as Cache} from "../src/index";
 import {uidSeparator} from "../src/constants/uid-separator";
 
 describe("Cache Service Insert Method", () => {
-   let cacheService: ResponseCache;
+   let cacheService: Cache;
 
    beforeEach(() => {
-      cacheService = new ResponseCache({
-         isDevMode: false,
-      });
+      cacheService = new Cache({isDevMode: false});
    });
 
    it("Inserts new data correctly.", async () => {

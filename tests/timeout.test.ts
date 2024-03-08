@@ -1,27 +1,21 @@
 import {ResponseCache as Cache} from "../src/index";
-import {lastValueFrom} from "rxjs";
 import {currentCounterUrl, postsUrl, resetCounterUrl} from "./server/urls";
 import {observableFunction} from "./utils/observable-function";
 import {pause} from "./utils/pause";
+import {getLastFactory} from "./utils/custom-get";
 
 describe("Cache service timeouts", () => {
    let cache: Cache;
+   let getLast: ReturnType<typeof getLastFactory>;
 
-   beforeEach(async () => {
+   beforeEach(() => {
       observableFunction(resetCounterUrl).subscribe();
-      cache = new Cache({
-         isDevMode: false,
-      });
+      cache = new Cache({isDevMode: false});
+      getLast = getLastFactory(cache);
    });
 
    it("Clears the data, observable and clear timeout after provided time if refresh=false.", async () => {
-      await lastValueFrom(
-         cache.get({
-            url: currentCounterUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            clearTimeout: 200,
-         })
-      );
+      await getLast({url: currentCounterUrl, clearTimeout: 200});
 
       expect(cache.clearTimeouts[currentCounterUrl]).toBeTruthy();
       await pause(300);
@@ -29,57 +23,35 @@ describe("Cache service timeouts", () => {
    });
 
    it("Clears the data, observable and clear timeout after provided time if refresh=false event if api is called several times.", async () => {
-      await lastValueFrom(
-         cache.get({
-            url: currentCounterUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            clearTimeout: 200,
-         })
-      );
+      await getLast({url: currentCounterUrl, clearTimeout: 200});
 
       await pause(150);
-      await lastValueFrom(
-         cache.get({
-            url: currentCounterUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            clearTimeout: 200,
-         })
-      );
+      await getLast({url: currentCounterUrl, clearTimeout: 200});
 
       await pause(100);
       checkVariablesToBeEmpty(cache);
    });
 
    it("Refreshes the data and clear timeout after provided time if refresh=true.", async () => {
-      await lastValueFrom(
-         cache.get({
-            url: currentCounterUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            refresh: true,
-            clearTimeout: 200,
-         })
-      );
+      await getLast({
+         url: currentCounterUrl,
+         refresh: true,
+         clearTimeout: 200,
+      });
 
       expect(cache.clearTimeouts[currentCounterUrl]).toBeTruthy();
-      expect(cache.data).toEqual({
-         [currentCounterUrl]: {counter: 1},
-      });
+      expect(cache.data).toEqual({[currentCounterUrl]: {counter: 1}});
 
       const oldTimeouts = cache.clearTimeouts;
 
-      await lastValueFrom(
-         cache.get({
-            url: currentCounterUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            refresh: true,
-            clearTimeout: 200,
-         })
-      );
+      await getLast({
+         url: currentCounterUrl,
+         refresh: true,
+         clearTimeout: 200,
+      });
 
       expect(cache.clearTimeouts[currentCounterUrl]).toBeTruthy();
-      expect(cache.data).toEqual({
-         [currentCounterUrl]: {counter: 2},
-      });
+      expect(cache.data).toEqual({[currentCounterUrl]: {counter: 2}});
 
       const newTimeouts = cache.clearTimeouts;
       expect(oldTimeouts).not.toEqual(newTimeouts);
@@ -89,24 +61,18 @@ describe("Cache service timeouts", () => {
    });
 
    it("Clears the previous timeout if new timeout has been set.", async () => {
-      await lastValueFrom(
-         cache.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            refresh: true,
-            clearTimeout: 300,
-         })
-      );
+      await getLast({
+         url: postsUrl,
+         refresh: true,
+         clearTimeout: 300,
+      });
       await pause(200);
 
-      await lastValueFrom(
-         cache.get({
-            url: postsUrl,
-            observable: ({arrangedUrl}) => observableFunction(arrangedUrl),
-            refresh: true,
-            clearTimeout: 300,
-         })
-      );
+      await getLast({
+         url: postsUrl,
+         refresh: true,
+         clearTimeout: 300,
+      });
       await pause(200);
 
       expect(cache.data[postsUrl]).toBeTruthy();
