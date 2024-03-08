@@ -1,4 +1,4 @@
-import {ResponseCache} from "./cache.service";
+import {ResponseCache} from "./service/index.service";
 
 /** @deprecated Use ResponseCache instead. */
 export class CacheService extends ResponseCache {}

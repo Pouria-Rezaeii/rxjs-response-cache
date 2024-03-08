@@ -1,6 +1,6 @@
-import {QueryParams} from "./query-params.type";
+import {QueryParams} from "./index.type";
 
-type GenericObservable<T> = {
+export type GenericObservable<T> = {
    subscribe: (subscriber: PartialObserver<T>) => {
       unsubscribe(): void;
    };

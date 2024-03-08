@@ -3,7 +3,7 @@ import {lastValueFrom} from "rxjs";
 import {firstPostUrl, postsUrl, postsWithPaginationUrl} from "./server/urls";
 import {observableFunction} from "./utils/observable-function";
 import {posts} from "./server/posts";
-import {QueryParams} from "../src/types/query-params.type";
+import {QueryParams} from "../src/types/index.type";
 
 let cacheService: ResponseCache;
 

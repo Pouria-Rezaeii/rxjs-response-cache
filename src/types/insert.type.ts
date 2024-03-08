@@ -1,4 +1,4 @@
-import {QueryParams} from "./query-params.type";
+import {QueryParams} from "./index.type";
 
 export type InsertParams = {
    uniqueIdentifier?: string;
