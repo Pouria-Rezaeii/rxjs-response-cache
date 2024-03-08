@@ -66,7 +66,7 @@ export function update<T>(assets: HandlerAssets, input: UpdateParams<T>): void {
 
          // todo: add Array scenario
 
-         const {arrayFieldName: path, resolver, url: selectorUrl, ...options} = keysSelector;
+         const {arrayFieldName: path, updateHandler, url: selectorUrl, ...options} = keysSelector;
          const matches = getMatchedKeys({
             source: cachedData,
             url: selectorUrl,
@@ -109,10 +109,10 @@ export function update<T>(assets: HandlerAssets, input: UpdateParams<T>): void {
                   updateDevtool,
                });
             });
-         } else if (resolver) {
+         } else if (updateHandler) {
             matches.forEach((key) => {
                const staleData = cachedData.get(key);
-               const freshData = resolver({oldData: staleData, updatedEntity: newValue});
+               const freshData = updateHandler({oldData: staleData, updatedEntity: newValue});
 
                CheckEqualityAndUpdate({
                   key,

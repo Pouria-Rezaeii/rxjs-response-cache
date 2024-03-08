@@ -107,7 +107,7 @@ describe("Cache Service Update Method", () => {
       expect(cacheService.data[postsWithPaginationUrl]["results"][0]).toEqual(newData);
    });
 
-   it("Accepts the `resolver` param.", async () => {
+   it("Accepts the `updateHandler` param.", async () => {
       await customFetch(firstPostUrl);
       await customFetch(postsWithPaginationUrl);
 
@@ -120,7 +120,7 @@ describe("Cache Service Update Method", () => {
             entityUniqueField: "id",
             keysSelector: {
                url: postsWithPaginationUrl,
-               resolver: ({oldData, updatedEntity}) => {
+               updateHandler: ({oldData, updatedEntity}) => {
                   return {
                      ...oldData,
                      results: oldData.results.map((item: any) => {

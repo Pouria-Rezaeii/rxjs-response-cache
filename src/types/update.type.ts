@@ -9,7 +9,7 @@ export type KeySelector = {
    params?: QueryParams;
    arrayFieldName?: string;
    // todo: add generic type
-   resolver?: (params: {oldData: any; updatedEntity: any}) => any;
+   updateHandler?: (params: {oldData: any; updatedEntity: any}) => any;
 };
 
 export type UpdateParams<T> = {
